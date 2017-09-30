@@ -23,7 +23,7 @@ startOptions :: Options
 startOptions = Options { optCode  = getContents
                        , optInput = ""
                        , optDeb   = False
-                       , optHead  = True
+                       , optHead  = False
                        }
 
 options :: [ OptDescr (Options -> IO Options) ]
@@ -47,10 +47,10 @@ options =
     (NoArg
       (\opt -> return opt { optDeb = True }))
     "Enable debugging"
-  , Option "H" ["headless"]
+  , Option "H" ["headful"]
     (NoArg
-      (\opt -> return opt { optHead = False }))
-    "Disable headless"
+      (\opt -> return opt { optHead = True }))
+    "Enable headful"
   , Option "v" ["version"]
       (NoArg
           (\_ -> do

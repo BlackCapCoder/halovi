@@ -97,9 +97,9 @@ msg req = do
 
 -------------
 
-run deb headless args p = do
+run deb headful args p = do
   let nodeArgs = "nm/main.js"
-               : [ "headless" | headless ]
+               : [ "headful" | headful ]
 
   (Just inp, Just out, err, ph)
     <- createProcess (proc "node" nodeArgs)

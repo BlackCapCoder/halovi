@@ -5,7 +5,7 @@ class Halovi {
 
   constructor () {
     const args       = process.argv.slice(2);
-    const isHeadless = args.includes('headless')
+    const isHeadless = !args.includes('headful');
 
     this.windows = [];
     (async () => {
