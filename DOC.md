@@ -44,23 +44,23 @@ Any command may be prefixed with a number. This will repeat the command n times.
 
 # Commands
 
-| Command        | Description                                                                          |
-|----------------|--------------------------------------------------------------------------------------|
-| o[String]      | Navigate to a url. If the argument is not a url, google it using google.com/ncr      |
-| [Reg]p         | Navigate to a url. If no register is provided, default to `"0`                       |
-| [Num]i[String] | Select the nth (defaults to 0) textbox on the page, type the string, and press enter |
-| /[String]      | Search for a regular expression                                                      |
-| \\[String]     | Search for a css query                                                               |
-| f[String]      | Search for a regular expression, and click the first result                          |
-| F[String]      | Search for a query, and click the first result                                       |
-| n              | Select the next search result. Fails if this is the last                             |
-| N              | Select the previous search result. Fails if this is the first                        |
-| *              | Select the next element of the same type. You may use n/N after this. May fail       |
-| [Reg]Y         | Copy text of selection to register. Defaults to `""`                                 |
-| [Reg]yy        | Copy the url of the current window to register. Defaults to `""`                     |
-| ]]             | Click the `next` or `>>` or similar link, to navigate to the next page               |
-| [[             | Click the `prev` or `<<` or similar link, to navigate to the previous page           |
-| gu             | Go up one level                                                                      |
-| gU             | Go to the root of the webpage                                                        |
-| [Num]gg        | Go to the top of the webpage or nth (default 0) search result                        |
-| [Num]G         | Go to the bottom of the webpage or nth (default 0) from last search result           |
+| Command [arg type/default] | Description                                                                     |
+|----------------------------|---------------------------------------------------------------------------------|
+| o[String]                  | Navigate to a url. If the argument is not a url, google it using google.com/ncr |
+| [Reg/0]p                   | Navigate to a url. If the argument is not a url, google it using google.com/ncr |
+| [Num/0]i[String]           | Select the nth textbox on the page, type the string, and press enter            |
+| /[String]                  | Search for a regular expression                                                 |
+| \\[String]                 | Search for a css query                                                          |
+| f[String]                  | Search for a regular expression, and click the first result                     |
+| F[String]                  | Search for a query, and click the first result                                  |
+| n                          | Select the next search result. Fails if this is the last                        |
+| N                          | Select the previous search result. Fails if this is the first                   |
+| *                          | Select the next element of the same type. You may use n/N after this. May fail  |
+| [Reg/"]Y                   | Copy text of selection to register.                                             |
+| [Reg/"]yy                  | Copy the url of the current window to register.                                 |
+| ]]                         | Click the `next` or `>>` or similar link, to navigate to the next page          |
+| [[                         | Click the `prev` or `<<` or similar link, to navigate to the previous page      |
+| gu                         | Go up one level                                                                 |
+| gU                         | Go to the root of the webpage                                                   |
+| [Num/0]gg                  | Go to the top of the webpage or nth search result                               |
+| [Num/0]G                   | Go to the bottom of the webpage or nth from last search result                  |
