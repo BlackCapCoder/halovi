@@ -4,9 +4,12 @@ const puppeteer = require('puppeteer');
 class Halovi {
 
   constructor () {
+    const args       = process.argv.slice(2);
+    const isHeadless = args.includes('headless')
+
     this.windows = [];
     (async () => {
-      this.browser = await puppeteer.launch({args: ['--no-sandbox'], headless: false});
+      this.browser = await puppeteer.launch({args: ['--no-sandbox'], headless: isHeadless});
       await this.createPage();
       this.output("READY");
     })();
@@ -33,7 +36,7 @@ class Halovi {
 
     switch (obj.reqCode) {
       case "EXEC":
-        eval(obj.reqMsg)
+        await eval(obj.reqMsg)
           . then ( resp => {
             if (resp === undefined)
               this.output();
@@ -114,13 +117,52 @@ class Halovi {
     }, q);
   }
 
-  async yank () {
+  async yankText () {
     let win = this.activeWindow();
     let ret = await win.evaluate(() => {
       return searchResult[searchIndex].innerText;
     });
     this.output("SUCCESS", ret.toString());
+    return 0;
   }
+  async yankURL () {
+    let win = this.activeWindow();
+    let ret = win.url();
+    this.output("SUCCESS", ret.toString());
+    return 0;
+  }
+
+  async goUp () {
+    let win = this.activeWindow();
+    let rx  = /(.*((\/.+)*))(\/.+)/;
+    let rs  = rx.exec(win.url());
+    if (rs === null || rs[1] === null || rs[1] == "http:/" || rs[1] == "https:/")
+      return;
+    await win.goto(rs[1]);
+  }
+  async goRoot () {
+    let win = this.activeWindow();
+    let rx  = /(https?:\/\/)?[^\/]+/;
+    let rs  = rx.exec(win.url());
+    if (rs === null) return;
+    await win.goto(rs[0]);
+  }
+  async goTop () {
+    let win = this.activeWindow();
+    let ret = await win.evaluate(() => {
+      searchIndex = 0;
+      window.scrollTo(0,0);
+    });
+  }
+  async goBottom () {
+    let win = this.activeWindow();
+    let ret = await win.evaluate(() => {
+      if (searchResult)
+        searchIndex = searchResult.length-1;
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  }
+
 
   async next () {
     let win = this.activeWindow();

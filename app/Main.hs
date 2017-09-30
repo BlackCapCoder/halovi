@@ -16,12 +16,14 @@ data Options = Options
   { optCode  :: IO String
   , optInput :: String
   , optDeb   :: Bool
+  , optHead  :: Bool
   }
 
 startOptions :: Options
 startOptions = Options { optCode  = getContents
                        , optInput = ""
                        , optDeb   = False
+                       , optHead  = True
                        }
 
 options :: [ OptDescr (Options -> IO Options) ]
@@ -45,6 +47,10 @@ options =
     (NoArg
       (\opt -> return opt { optDeb = True }))
     "Enable debugging"
+  , Option "H" ["headless"]
+    (NoArg
+      (\opt -> return opt { optHead = False }))
+    "Disable headless"
   , Option "v" ["version"]
       (NoArg
           (\_ -> do
@@ -67,6 +73,7 @@ main = do
   opts <- foldl (>>=) (return startOptions) actions
   let Options { optCode  = code
               , optInput = input
-              , optDeb   = debug } = opts
+              , optDeb   = debug
+              , optHead  = headl } = opts
 
-  code >>= run debug (words input) . parse
+  code >>= run debug headl (words input) . parse

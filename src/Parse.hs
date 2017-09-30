@@ -48,21 +48,30 @@ reg = normReg <|> shortReg
 
 optional' o f = fromMaybe f <$> optional o
 
-open   = termString $ char 'o'  >> return Open
-input  = termString $ char 'i'  >> return Input
-search = termString $ char '/'  >> return Search
-query  = termString $ char '\\' >> return Query
-find   = termString $ char 'f' >> return (\x -> Group [Search x, Click])
-find'  = termString $ char 'F' >> return (\x -> Group [Query x, Click])
-quit   = exCmds (words "quit! quit q! q") >> return Quit
-quitA  = exCmds (words "quitall! quitall qall! qall qa! qa") >> return QuitAll
-yank   = char 'Y' >> return Yank
-next   = char 'n' >> return Next
-prev   = char 'N' >> return Prev
-star   = char '*' >> return NextOfType
-wopen  = char 'O' >> return WindowSelection
+withReg f p = do
+  r <- optional' reg $ Reg '"'
+  p
+  return $ f r
+
+open     = termString $ char 'o'  >> return Open
+input    = termString $ char 'i'  >> return Input
+search   = termString $ char '/'  >> return Search
+query    = termString $ char '\\' >> return Query
+find     = termString $ char 'f' >> return (\x -> Group [Search x, Click])
+find'    = termString $ char 'F' >> return (\x -> Group [Query x, Click])
+quit     = exCmds (words "quit! quit q! q") >> return Quit
+quitA    = exCmds (words "quitall! quitall qall! qall qa! qa") >> return QuitAll
+next     = char 'n' >> return Next
+prev     = char 'N' >> return Prev
+star     = char '*' >> return NextOfType
 nextPage = string "]]" >> return NextPage
 prevPage = string "[[" >> return PrevPage
+yankText = withReg YankText $ string "Y"
+yankURL  = withReg YankURL  $ string "yy"
+goUp     = string "gu" >> return GoUp
+goRoot   = string "gU" >> return GoRoot
+goTop    = string "gg" >> return GoTop
+goBottom = string "G" >> return GoBottom
 
 paste = do
   r <- optional' (pure<$>reg) [Reg '0']
@@ -81,8 +90,9 @@ rep = do
 
 stmt = choice $ map try
   [ open, input, quitA, quit, search, query, loop, paste
-  , yank, next, prev, find, find', nextPage, prevPage
-  , star, rep, wopen
+  , next, prev, find, find', nextPage, prevPage
+  , yankText, yankURL
+  , star, rep, goUp, goRoot, goTop, goBottom
   ]
 
 

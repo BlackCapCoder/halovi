@@ -17,14 +17,16 @@ import GHC.Generics
 import qualified Data.ByteString as T
 import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Char8 as I
+import Data.Char
 
 
 data Op = Open Str' | Input Str' | Search Str' | Query Str'
         | Quit | QuitAll
         | Loop [Op] | Group [Op] | Repeat Int Op
-        | Yank | Prev | Next | Click
+        | Prev | Next | Click
         | NextPage | PrevPage | NextOfType
-        | WindowSelection
+        | YankText Str | YankURL Str
+        | GoUp | GoRoot | GoTop | GoBottom
         deriving Show
 
 data Str  = Reg Char | Chr Char deriving Show
@@ -40,6 +42,10 @@ data PState = PState
 
 getReg name = fromMaybe "" . M.lookup name <$> gets registers
 
+setReg r v = case r of
+  Reg '"' -> liftIO $ putStrLn v
+  Reg x   -> lift . modify $ \s -> s
+    { registers = M.insert x v $ registers s }
 
 data Response = Response
   { respCode :: RespCode
@@ -91,9 +97,12 @@ msg req = do
 
 -------------
 
-run deb args p = do
+run deb headless args p = do
+  let nodeArgs = "nm/main.js"
+               : [ "headless" | headless ]
+
   (Just inp, Just out, err, ph)
-    <- createProcess (proc "node" ["nm/main.js"])
+    <- createProcess (proc "node" nodeArgs)
                      { std_in  = CreatePipe
                      , std_out = CreatePipe }
 
@@ -127,15 +136,6 @@ formatURL url
 
 ------------
 
-runOp Prev            = void . msg $ Request EXEC "this.prev()"
-runOp Next            = void . msg $ Request EXEC "this.next()"
-runOp NextPage        = void . msg $ Request EXEC "this.nextPage()"
-runOp PrevPage        = void . msg $ Request EXEC "this.prevPage()"
-runOp NextOfType      = void . msg $ Request EXEC "this.nextOfType()"
-runOp Click           = void . msg $ Request EXEC "this.click()"
-runOp WindowSelection = void . msg $ Request EXEC "this.wopenSel()"
-runOp Quit            = void . msg $ Request EXEC "this.quit()"
-
 runOp (Open url) = do
   url' <- str url
   void . msg $ Request EXEC $ "this.open(\"" ++ formatURL url' ++ "\")"
@@ -154,9 +154,12 @@ runOp (Query text) = do
   text' <- str text
   void . msg $ Request EXEC $ "this.query(\"" ++ text' ++ "\")"
 
-runOp Yank = do
-  Response SUCCESS answ <- msg $ Request EXEC "this.yank()"
-  liftIO $ putStrLn answ
+runOp (YankText r) = do
+  Response SUCCESS answ <- msg $ Request EXEC "this.yankText()"
+  setReg r answ
+runOp (YankURL r) = do
+  Response SUCCESS answ <- msg $ Request EXEC "this.yankURL()"
+  setReg r answ
 
 
 runOp (Group x) = void . lift . runMaybeT $ forM_ x runOp
@@ -166,3 +169,6 @@ runOp (Repeat n (Loop x))
   = void . lift . runMaybeT . forM_ [1..n] . const $ forM_ x runOp
 runOp (Repeat n o) = void . forM_ [1..n] . const $ runOp o
 
+
+runOp x | (h:r) <- show x
+        = void . msg . Request EXEC $ "this." ++ toLower h : r ++ "()"
