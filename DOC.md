@@ -13,11 +13,11 @@ When the program is run, the registers `"0` trough `"9` will be populated with t
 # Loops
 
 A loop begins with the `<` character, and ends with `>` or `EOF`. Whatever is inside the loop will be executed repeatedly an infinite number of times, or until an error is produced.
+If prefixed by a number n, the loop will be executed n times, rather than infinite. If anything inside the loop fails the loop will break immediately, and program execution will proceed normally.
 
 # Numbers
 
 Any command may be prefixed with a number. This will repeat the command n times.
-When before a loop, the loop will be executed n times, rather than infinite. If anything inside the loop fails the loop will break immediately, and program execution will proceed normally.
 
 # Commands
 
