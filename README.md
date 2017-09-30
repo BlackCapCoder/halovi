@@ -1,5 +1,5 @@
 # Halovi
-Halovi is a vi-like language for web scraping and automation. Upon execution, it will read a scroll of alien language to summon headless browsers and headless neovims to perform dark magic on webpages. That's pretty spooky, thus halovi (as in Halloween).
+Halovi is a vi-like language for web scraping and automation. Upon execution it will read a scroll of alien language, summoning headless browsers and neovims to perform dark magic on webpages. That's pretty spooky, thus halovi (as in Halloween).
 
 # Free scrolls
 

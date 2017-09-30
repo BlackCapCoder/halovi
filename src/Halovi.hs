@@ -77,6 +77,7 @@ getResponse = do
   deb <- lift $ gets debug
   ln  <- liftIO $ T.hGetLine out
   when deb . liftIO $ I.putStrLn ln
+
   case decode $ L.fromStrict ln of
     Just x -> return x
     _   -> do
@@ -84,6 +85,9 @@ getResponse = do
 
 sendRequest req = do
   inp <- lift $ gets hInput
+  deb <- lift $ gets debug
+  when deb . liftIO . I.putStrLn . L.toStrict $ encode req
+
   liftIO $ do
     I.hPutStrLn inp . L.toStrict $ encode req
     hFlush inp
@@ -142,9 +146,12 @@ runOp (Open url) = do
 
 runOp QuitAll = sendRequest $ Request EXEC "this.quitAll()"
 
+runOp (Repeat n (Input text)) = do
+  text' <- str text
+  void . msg $ Request EXEC $ "this.input(\"" ++ text' ++ "\", " ++ show n ++ ")"
 runOp (Input text) = do
   text' <- str text
-  void . msg $ Request EXEC $ "this.input(\"" ++ text' ++ "\")"
+  void . msg $ Request EXEC $ "this.input(\"" ++ text' ++ "\", 0)"
 
 runOp (Search text) = do
   text' <- str text

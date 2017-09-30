@@ -65,10 +65,10 @@ class Halovi {
     // await page.screenshot({path: 'tst.png'});
   }
 
-  async input (txt) {
+  async input (txt, n) {
     let win = this.activeWindow();
 
-    const status = await win.evaluate(() => {
+    const status = await win.evaluate(n => {
       var filterVisible = function (els) {
         var vis = [];
         for (var i = 0; i < els.length; i++)
@@ -79,20 +79,20 @@ class Halovi {
 
       let els = document.querySelectorAll('input[type=search],input[type=text],input[type=password],textarea');
       let vis = filterVisible(els);
-      if (vis.length <= 0) return "Input not found";
-      let el = vis[0];
+      if (vis.length <= n) return "Input not found";
+      let el = vis[n];
       el.focus();
       el.setSelectionRange(0, el.value.length);
       return "OK";
-    });
-
-    await win.type(txt + String.fromCharCode(13));
-    await win.waitForNavigation();
+    }, n);
 
     if (status !== "OK") {
       this.output("FAILURE", status);
       return 0;
     }
+
+    await win.type(txt + String.fromCharCode(13));
+    await win.waitForNavigation();
   }
 
   async query (q) {
