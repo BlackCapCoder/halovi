@@ -9,31 +9,25 @@ Downloads every single person from the Norwegian phone book matching some string
 o1881.no⏎⁰ifP<⁰/Y<*Y>]]
 ```
 
+```
+o1881.no      Navigate to http://www.1881.no
+⁰i            Write arg0 in the search box and press enter
+fP            Click the first link starting with 'P' (Personer)
+
+<             Begin loop, break on fail
+  ⁰/          Search for arg0 and select the first result
+  Y           Copy selection to STDOUT
+    <         Begin second loop, break on fail
+      *       Select next element of same type, fails if no more elements
+      Y       Copy selection to STDOUT
+    >         End second loop
+  ]]          Go to next page, by clicking "next" or ">>" or simular
+>             End first loop
+```
+
 Usage:
 ```
 halovi -f file.scroll -i blackcap
-```
-
-It is equivalent to this:
-```
-o1881.no      Open http://www.1881.no
-"0i           Write arg0 in the search box and press enter
-fP            Click the first link starting with 'P' (Personer)
-
-qg            Record macro `g`
-*             Select next element of same type as the one currently selected
-Y             Append selected element to STDOUT
-@g            Recursively call `g`
-q             Stop recording
-
-qq            Record macro `q`
-"0/           Search for the text in arg0
-Y             Append selected element to STDOUT
-@g            Run the `g` macro
-]]            Go to next page (click the next>> button)
-@q            Recursively call `q`
-q             Stop recording macro `q`
-@q            Run macro `q`
 ```
 
 For more info, see [DOC.md](/DOC.md).
