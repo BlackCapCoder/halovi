@@ -7,9 +7,8 @@ Additionally, any command that takes a string can be prefixed with a register in
 
 # Registers
 
-A register is a location in memory where you can store data. When the program is run, the registers 0 trough 9 will be populated with the input arguments.
-A register is written `"` plus a single character that is the name of the register. Any character can be used.
-`⁰`, `¹` .. `⁹` is equivalent to `"0`, `"1` .. `"9`.
+A register is a location in memory where you can store data. A register is written `"` plus a single character that is the name of the register. Any character can be used.
+When the program is run, the registers `"0` trough `"9` will be populated with the input arguments. `⁰`, `¹` .. `⁹` is equivalent to `"0`, `"1` .. `"9`.
 
 # Loops
 
@@ -22,18 +21,18 @@ When before a loop, the loop will be executed n times, rather than infinite. If 
 
 # Commands
 
-| Command   | Description                                                                        |
-|-----------|------------------------------------------------------------------------------------|
-| o[String] | Navigate to a url. If the argument is not a url, google it using google.com/ncr    |
-| [Reg]p    | Navigate to a url. If no register is provided, default to `"0`                     |
-| i[String] | Select the first textbox on the page, type the string, and press enter             |
-| /[String] | Search for a string                                                                |
-| \[String] | Search for a css query                                                             |
-| f[String] | Search for a string, and click the first result                                    |
-| F[String] | Search for a query, and click the first result                                     |
-| n         | Select to the next search result. Fails if this is the last                        |
-| N         | Select to the previous search result. Fails if this is the first                   |
-| *         | Select the next element of the same type. You may use n/N after this. May fail     |
-| Y         | Copy the text of the current search result to STDOUT. Fails if nothing is selected |
-| ]]        | Click the `next` or `>>` or similar link, to navigate to the next page             |
-| [[        | Click the `prev` or `<<` or similar link, to navigate to the previous page         |
+| Command    | Description                                                                        |
+|------------|------------------------------------------------------------------------------------|
+| o[String]  | Navigate to a url. If the argument is not a url, google it using google.com/ncr    |
+| [Reg]p     | Navigate to a url. If no register is provided, default to `"0`                     |
+| i[String]  | Select the first textbox on the page, type the string, and press enter             |
+| /[String]  | Search for a string                                                                |
+| \\[String] | Search for a css query                                                             |
+| f[String]  | Search for a string, and click the first result                                    |
+| F[String]  | Search for a query, and click the first result                                     |
+| n          | Select to the next search result. Fails if this is the last                        |
+| N          | Select to the previous search result. Fails if this is the first                   |
+| *          | Select the next element of the same type. You may use n/N after this. May fail     |
+| Y          | Copy the text of the current search result to STDOUT. Fails if nothing is selected |
+| ]]         | Click the `next` or `>>` or similar link, to navigate to the next page             |
+| [[         | Click the `prev` or `<<` or similar link, to navigate to the previous page         |
