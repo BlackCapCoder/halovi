@@ -100,6 +100,7 @@ class Halovi {
     let ret = await win.evaluate((q) => {
       searchResult = document.querySelectorAll(q);
       searchIndex  = 0;
+      searchResult[searchIndex].focus();
     }, q);
   }
 
@@ -114,13 +115,14 @@ class Halovi {
               res.push(els[i]);
       searchResult = res;
       searchIndex  = 0;
+      searchResult[searchIndex].focus();
     }, q);
   }
 
   async yankText () {
     let win = this.activeWindow();
     let ret = await win.evaluate(() => {
-      return searchResult[searchIndex].innerText;
+      return document.activeElement.innerText;
     });
     this.output("SUCCESS", ret.toString());
     return 0;
@@ -147,31 +149,51 @@ class Halovi {
     if (rs === null) return;
     await win.goto(rs[0]);
   }
-  async goTop () {
+  async goTop (n=0) {
     let win = this.activeWindow();
     let ret = await win.evaluate(() => {
-      searchIndex = 0;
-      window.scrollTo(0,0);
+      if (searchResult) {
+        searchResult[searchIndex = n].focus();
+      } else {
+        window.scrollTo(0,0);
+      }
     });
   }
-  async goBottom () {
+  async goBottom (n=0) {
     let win = this.activeWindow();
     let ret = await win.evaluate(() => {
-      if (searchResult)
-        searchIndex = searchResult.length-1;
-      window.scrollTo(0, document.body.scrollHeight);
+      if (searchResult) {
+        searchResult[searchIndex = searchResult.length-1-n].focus();
+      } else {
+        window.scrollTo(0, document.body.scrollHeight);
+      }
     });
   }
 
 
+  async prev () {
+    let win = this.activeWindow();
+    let ret = await win.evaluate(() => {
+      if (searchIndex == 0)
+        return "No more results";
+
+      searchResult[--searchIndex].focus();
+      return "OK"
+    });
+
+    if (ret !== "OK") {
+      this.output("FAILURE", ret);
+      return 0;
+    }
+  }
   async next () {
     let win = this.activeWindow();
     let ret = await win.evaluate(() => {
       if (searchIndex == searchResult.length-1)
         return "No more results";
 
-      searchIndex++;
-      return "OK"
+      searchResult[++searchIndex].focus();
+      return "OK";
     });
 
     if (ret !== "OK") {
@@ -361,20 +383,24 @@ class Halovi {
       selector = "";
       for (let c = 0; c < 10; c++) {
         if (selection.classList.length <= 0) {
+          selector = selection.tagName
           selection = selection.parentElement;
           continue;
         }
+        let cur = ""
         for (let i = 0; i < selection.classList.length; i++) {
-          selector += "." + selection.classList[i];
-          break;
+          cur += "." + selection.classList[i];
         }
+        selector = cur + " > " + selector;
+        break;
       }
       searchResult = document.querySelectorAll(selector);
       for (searchIndex=0; searchIndex < searchResult.length; searchIndex++) {
-        if (searchResult[searchIndex] == orig || searchResult[searchIndex].contains(orig)) break;
+        if ( searchResult[searchIndex] == orig
+          || searchResult[searchIndex].contains(orig)) break;
       }
-      searchIndex++;
-      if (searchIndex >= searchResult.length) return "No next element";
+      if (searchIndex+1 >= searchResult.length) return selector;
+      searchResult[++searchIndex].focus();
       return "OK";
     });
 

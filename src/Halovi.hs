@@ -117,6 +117,8 @@ run deb headful args p = do
         , debug     = deb
         }
 
+  when deb $ print p
+
   void . flip runStateT st $ do
     void $ runMaybeT $ do
       whileM_ ((READY/=).respCode <$> getResponse) (return ())
@@ -136,7 +138,6 @@ formatURL url
   | "http://" `isPrefixOf` url = url
   | "."       `isInfixOf`  url = "http://" ++ url
   | otherwise = "https://www.google.com/search?pws=0&gl=us&gws_rd=cr&q=" ++ url
---
 
 ------------
 
@@ -172,6 +173,10 @@ runOp (YankURL r) = do
 runOp (Group x) = void . lift . runMaybeT $ forM_ x runOp
 runOp (Loop  x) = void . lift . runMaybeT . forever $ forM_ x runOp
 
+
+runOp (Repeat n GoTop) = void . msg . Request EXEC $ "this.goTop(" ++ show n ++ ")"
+runOp (Repeat n GoBottom) = void . msg . Request EXEC $ "this.goBottom(" ++ show n ++ ")"
+
 runOp (Repeat n (Loop x))
   = void . lift . runMaybeT . forM_ [1..n] . const $ forM_ x runOp
 runOp (Repeat n o) = void . forM_ [1..n] . const $ runOp o
@@ -179,3 +184,4 @@ runOp (Repeat n o) = void . forM_ [1..n] . const $ runOp o
 
 runOp x | (h:r) <- show x
         = void . msg . Request EXEC $ "this." ++ toLower h : r ++ "()"
+

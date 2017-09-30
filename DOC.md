@@ -56,11 +56,11 @@ Any command may be prefixed with a number. This will repeat the command n times.
 | n              | Select the next search result. Fails if this is the last                             |
 | N              | Select the previous search result. Fails if this is the first                        |
 | *              | Select the next element of the same type. You may use n/N after this. May fail       |
-| [Reg]Y         | Copy text of selection. Defaults to `""`                                             |
-| [Reg]yy        | Copy the url of the current window. Defaults to `""`                                 |
+| [Reg]Y         | Copy text of selection to register. Defaults to `""`                                 |
+| [Reg]yy        | Copy the url of the current window to register. Defaults to `""`                     |
 | ]]             | Click the `next` or `>>` or similar link, to navigate to the next page               |
 | [[             | Click the `prev` or `<<` or similar link, to navigate to the previous page           |
 | gu             | Go up one level                                                                      |
 | gU             | Go to the root of the webpage                                                        |
-| gg             | Go to the top of the webpage or first search result                                  |
-| G              | Go to the bottom of the webpage or last search result                                |
+| [Num]gg        | Go to the top of the webpage or nth (default 0) search result                        |
+| [Num]G         | Go to the bottom of the webpage or nth (default 0) from last search result           |
