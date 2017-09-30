@@ -54,6 +54,6 @@ neovim # Not currently, but soon-ish
 
 # Note
 
-Halovi is far from done; I am not even close to implementing all the features that I want from it!
+Halovi is far from done; I am not even close to implementing all the features that I want from it! See [TODO.md](/TODO.md) and feel free to post feature requests.
 
 Halovi currently does not support multiple windows, because I have to wait for [this](https://github.com/GoogleChrome/puppeteer/pull/554).
