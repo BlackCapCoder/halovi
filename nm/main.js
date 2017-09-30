@@ -107,7 +107,15 @@ class Halovi {
   async search (q) {
     let win = this.activeWindow();
     let ret = await win.evaluate((q) => {
-      pat = RegExp(q);
+      let pat;
+      let m = q.match(/(.+)\/(.+)/);
+
+      if (m !== null && q[q.length-1] != '/') {
+        pat = RegExp(m[2], m[3]);
+      } else {
+        pat = RegExp(q);
+      }
+
       els = document.querySelectorAll('a');
       res = [];
       for (let i = 0; i < els.length; i++)
@@ -151,23 +159,25 @@ class Halovi {
   }
   async goTop (n=0) {
     let win = this.activeWindow();
-    let ret = await win.evaluate(() => {
+    let ret = await win.evaluate(n => {
       if (searchResult) {
-        searchResult[searchIndex = n].focus();
+        searchIndex = n;
+        searchResult[searchIndex].focus();
       } else {
         window.scrollTo(0,0);
       }
-    });
+    }, n);
   }
   async goBottom (n=0) {
     let win = this.activeWindow();
-    let ret = await win.evaluate(() => {
+    let ret = await win.evaluate(n => {
       if (searchResult) {
-        searchResult[searchIndex = searchResult.length-1-n].focus();
+        searchIndex = searchResult.length-1-n;
+        searchResult[searchIndex].focus();
       } else {
         window.scrollTo(0, document.body.scrollHeight);
       }
-    });
+    }, n);
   }
 
 
@@ -391,7 +401,7 @@ class Halovi {
         for (let i = 0; i < selection.classList.length; i++) {
           cur += "." + selection.classList[i];
         }
-        selector = cur + " > " + selector;
+        selector = cur + (selector == "" ? "" : " > " + selector);
         break;
       }
       searchResult = document.querySelectorAll(selector);
