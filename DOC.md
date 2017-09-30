@@ -1,3 +1,18 @@
+# Flags
+
+You can get a list of program flags by running `halovi -h`. It will look something like this:
+
+```
+Halovi - Version 0.0.1
+  -f FILE    --file=FILE     File with code
+  -c CODE    --code=CODE     Program code
+  -i STRING  --input=STRING  Program input
+  -d         --debug         Enable debugging
+  -H         --headful       Enable headful
+  -v         --version       Print version
+  -h         --help          Show help
+```
+
 # Strings
 
 If a command takes a string as an argument, all trailing characters until a linebreak will be treated as a string. If any of the characters `⁰¹²³⁴⁵⁶⁷⁸⁹` is present, they will be replaced with the contents of their respective registers.
@@ -46,5 +61,5 @@ Any command may be prefixed with a number. This will repeat the command n times.
 | [[         | Click the `prev` or `<<` or similar link, to navigate to the previous page      |
 | gu         | Go up one level                                                                 |
 | gU         | Go to the root of the webpage                                                   |
-| gg         | Go to the top of the webpage and first search result                            |
-| G          | Go to the bottom of the webpage and last search result                          |
+| gg         | Go to the top of the webpage or first search result                            |
+| G          | Go to the bottom of the webpage or last search result                          |
