@@ -15,11 +15,13 @@ programName   = "Halovi" ++ " - " ++ versionString
 data Options = Options
   { optCode  :: IO String
   , optInput :: String
+  , optDeb   :: Bool
   }
 
 startOptions :: Options
 startOptions = Options { optCode  = getContents
                        , optInput = ""
+                       , optDeb   = False
                        }
 
 options :: [ OptDescr (Options -> IO Options) ]
@@ -39,6 +41,10 @@ options =
       (\arg opt -> return opt { optInput = arg })
       "STRING")
     "Program input"
+  , Option "d" ["debug"]
+    (NoArg
+      (\opt -> return opt { optDeb = True }))
+    "Enable debugging"
   , Option "v" ["version"]
       (NoArg
           (\_ -> do
@@ -60,6 +66,7 @@ main = do
 
   opts <- foldl (>>=) (return startOptions) actions
   let Options { optCode  = code
-              , optInput = input } = opts
+              , optInput = input
+              , optDeb   = debug } = opts
 
-  code >>= run (words input) . parse
+  code >>= run debug (words input) . parse

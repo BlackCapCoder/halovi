@@ -60,6 +60,7 @@ yank   = char 'Y' >> return Yank
 next   = char 'n' >> return Next
 prev   = char 'N' >> return Prev
 star   = char '*' >> return NextOfType
+wopen  = char 'O' >> return WindowSelection
 nextPage = string "]]" >> return NextPage
 prevPage = string "[[" >> return PrevPage
 
@@ -81,7 +82,7 @@ rep = do
 stmt = choice $ map try
   [ open, input, quitA, quit, search, query, loop, paste
   , yank, next, prev, find, find', nextPage, prevPage
-  , star, rep
+  , star, rep, wopen
   ]
 
 

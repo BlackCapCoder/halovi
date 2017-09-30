@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase, DeriveGeneric, DuplicateRecordFields #-}
 module Halovi where
 
 import System.Process
@@ -12,12 +12,19 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.State
 import Control.Monad.IO.Class
 import qualified Data.Map as M
+import Data.Aeson
+import GHC.Generics
+import qualified Data.ByteString as T
+import qualified Data.ByteString.Lazy as L
+import qualified Data.ByteString.Char8 as I
+
 
 data Op = Open Str' | Input Str' | Search Str' | Query Str'
         | Quit | QuitAll
         | Loop [Op] | Group [Op] | Repeat Int Op
         | Yank | Prev | Next | Click
         | NextPage | PrevPage | NextOfType
+        | WindowSelection
         deriving Show
 
 data Str  = Reg Char | Chr Char deriving Show
@@ -26,114 +33,136 @@ type Program  = [Op]
 
 data PState = PState
   { registers :: M.Map Char String
+  , hInput    :: Handle
+  , hOutput   :: Handle
+  , debug     :: Bool
   }
 
-run args p = do
-  let st = PState
-        { registers = M.fromList $ zip (show =<< [0..9]) args
-        }
+getReg name = fromMaybe "" . M.lookup name <$> gets registers
 
-  (Just inp, Just out, err, pid)
+
+data Response = Response
+  { respCode :: RespCode
+  , respMsg  :: String
+  } deriving (Generic, Show)
+
+data RespCode
+  = READY | SUCCESS | FAILURE | LOG
+  deriving (Generic, Show, Eq)
+
+instance FromJSON Response
+instance FromJSON RespCode
+
+
+data Request = Request
+  { reqCode :: ReqCode
+  , reqMsg  :: String
+  } deriving (Generic, Show)
+data ReqCode
+  = EXEC | LOREM
+  deriving (Generic, Show, Eq)
+
+instance ToJSON Request
+instance ToJSON ReqCode
+
+
+getResponse = do
+  out <- lift $ gets hOutput
+  deb <- lift $ gets debug
+  ln  <- liftIO $ T.hGetLine out
+  when deb . liftIO $ I.putStrLn ln
+  case decode $ L.fromStrict ln of
+    Just x -> return x
+    _   -> do
+      getResponse
+
+sendRequest req = do
+  inp <- lift $ gets hInput
+  liftIO $ do
+    I.hPutStrLn inp . L.toStrict $ encode req
+    hFlush inp
+
+msg req = do
+  sendRequest req
+  resp <- getResponse
+  case resp of
+    Response FAILURE _ -> mzero
+    _                  -> return resp
+
+-------------
+
+run deb args p = do
+  (Just inp, Just out, err, ph)
     <- createProcess (proc "node" ["nm/main.js"])
                      { std_in  = CreatePipe
                      , std_out = CreatePipe }
-  whileM_ ((/="ready") <$> hGetLine out) (return ())
-  void . flip runStateT st $ mapM_ (\x -> liftIO (print x) >> runOp inp out x) p
 
-getReg name = fromMaybe "" . M.lookup name <$> gets registers
+  let st = PState
+        { registers = M.fromList $ zip (show =<< [0..9]) args
+        , hInput    = inp
+        , hOutput   = out
+        , debug     = deb
+        }
+
+  void . flip runStateT st $ do
+    void $ runMaybeT $ do
+      whileM_ ((READY/=).respCode <$> getResponse) (return ())
+      when deb . liftIO $ putStrLn "GOT READY"
+      mapM_ runOp p
+      runOp QuitAll
+
 
 str str = do
   res <- forM str $ \case
     Chr x -> return [x]
-    Reg x -> getReg x
-  liftIO $ putStrLn $ concat res
+    Reg x -> lift $ getReg x
+  -- liftIO $ putStrLn $ concat res
   return $ concat res
-
-
-runOp inp out (Open url) = do
-  url' <- str url
-  answ <- message inp out $ "this.open(\"" ++ formatURL url' ++ "\")"
-  handleErr answ
-
-runOp inp out (Input text) = do
-  text' <- str text
-  answ <- message inp out $ "this.input(\"" ++ text' ++ "\")"
-  handleErr answ
-
-runOp inp out (Search text) = do
-  text' <- str text
-  answ <- message inp out $ "this.search(\"" ++ text' ++ "\")"
-  handleErr answ
-
-runOp inp out (Query text) = do
-  text' <- str text
-  answ <- message inp out $ "this.query(\"" ++ text' ++ "\")"
-  handleErr answ
-
-runOp inp out Yank = do
-  answ <- message inp out "this.yank()"
-  liftIO $ putStrLn answ
-  return $ Just ()
-
-runOp inp out Next = do
-  answ <- message inp out "this.next()"
-  handleErr answ
-
-runOp inp out Click = do
-  answ <- message inp out "this.click()"
-  handleErr answ
-
-runOp inp out NextPage = do
-  answ <- message inp out "this.nextPage()"
-  handleErr answ
-
-runOp inp out PrevPage = do
-  answ <- message inp out "this.prevPage()"
-  handleErr answ
-
-runOp inp out NextOfType = do
-  answ <- message inp out "this.nextOfType()"
-  handleErr answ
-
-runOp inp out (Loop x) = do
-  _ <- runMaybeT . forever $
-    forM_ x $ \a -> do
-      q <- lift $ runOp inp out a
-      when (q==Nothing) mzero
-  return $ Just ()
-
-runOp inp out (Repeat n (Loop x)) = do
-  _ <- runMaybeT . forM_ [1..n] . const $
-    forM_ x $ \a -> do
-      q <- lift $ runOp inp out a
-      when (q==Nothing) mzero
-  return $ Just ()
-
-runOp inp out (Group x) =
-  runMaybeT $
-    forM_ x $ \a -> do
-      q <- lift $ runOp inp out a
-      when (q==Nothing) mzero
-
-runOp inp out (Repeat n o) = do
-  forM_ [1..n] . const $ runOp inp out o
-  return $ Just ()
-
-
-runOp inp out Quit = message inp out "this.quit()" >> return (Just ())
-runOp inp out QuitAll = message inp out "this.quitAll()" >> return Nothing
-
 
 formatURL url
   | "http://" `isPrefixOf` url = url
   | "."       `isInfixOf`  url = "http://" ++ url
   | otherwise = "https://www.google.com/search?pws=0&gl=us&gws_rd=cr&q=" ++ url
+--
 
-message inp out msg = liftIO $ do
-  hPutStrLn inp msg
-  hFlush inp
-  hGetLine out
+------------
 
-handleErr code
-  | code == "OK" = return $ Just ()
-  | otherwise = return Nothing
+runOp Prev            = void . msg $ Request EXEC "this.prev()"
+runOp Next            = void . msg $ Request EXEC "this.next()"
+runOp NextPage        = void . msg $ Request EXEC "this.nextPage()"
+runOp PrevPage        = void . msg $ Request EXEC "this.prevPage()"
+runOp NextOfType      = void . msg $ Request EXEC "this.nextOfType()"
+runOp Click           = void . msg $ Request EXEC "this.click()"
+runOp WindowSelection = void . msg $ Request EXEC "this.wopenSel()"
+runOp Quit            = void . msg $ Request EXEC "this.quit()"
+
+runOp (Open url) = do
+  url' <- str url
+  void . msg $ Request EXEC $ "this.open(\"" ++ formatURL url' ++ "\")"
+
+runOp QuitAll = sendRequest $ Request EXEC "this.quitAll()"
+
+runOp (Input text) = do
+  text' <- str text
+  void . msg $ Request EXEC $ "this.input(\"" ++ text' ++ "\")"
+
+runOp (Search text) = do
+  text' <- str text
+  void . msg $ Request EXEC $ "this.search(\"" ++ text' ++ "\")"
+
+runOp (Query text) = do
+  text' <- str text
+  void . msg $ Request EXEC $ "this.query(\"" ++ text' ++ "\")"
+
+runOp Yank = do
+  Response SUCCESS answ <- msg $ Request EXEC "this.yank()"
+  liftIO $ putStrLn answ
+
+
+runOp (Group x) = void . lift . runMaybeT $ forM_ x runOp
+runOp (Loop  x) = void . lift . runMaybeT . forever $ forM_ x runOp
+
+runOp (Repeat n (Loop x))
+  = void . lift . runMaybeT . forM_ [1..n] . const $ forM_ x runOp
+runOp (Repeat n o) = void . forM_ [1..n] . const $ runOp o
+
