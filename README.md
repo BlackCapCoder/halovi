@@ -36,6 +36,8 @@ q             Stop recording macro `q`
 @q            Run macro `q`
 ```
 
+For more info, see [DOC.md](/DOC.md).
+
 # Building
 
 ```bash

@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib, Parse, Halovi
+  exposed-modules:     Parse, Halovi
   build-depends:       base >= 4.7 && < 5
                      , megaparsec >= 6.0.0
                      , process
