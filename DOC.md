@@ -8,7 +8,9 @@ Additionally, any command that takes a string can be prefixed with a register in
 # Registers
 
 A register is a location in memory where you can store data. A register is written `"` plus a single character that is the name of the register. Any character can be used.
-When the program is run, the registers `"0` trough `"9` will be populated with the input arguments. `⁰`, `¹` .. `⁹` is equivalent to `"0`, `"1` .. `"9`.
+When the program is run, the registers `"0` trough `"9` will be populated with the input arguments.
+
+`⁰`, `¹` .. `⁹` is equivalent to `"0`, `"1` .. `"9`.
 
 ### Special Registers
 
@@ -17,6 +19,7 @@ When the program is run, the registers `"0` trough `"9` will be populated with t
 # Loops
 
 A loop begins with the `<` character, and ends with `>` or `EOF`. Whatever is inside the loop will be executed repeatedly an infinite number of times, or until an error is produced.
+
 If prefixed by a number n, the loop will be executed n times, rather than infinite. If anything inside the loop fails the loop will break immediately, and program execution will proceed normally.
 
 # Numbers
