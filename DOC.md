@@ -40,7 +40,7 @@ Any command may be prefixed with a number. This will repeat the command n times.
 | n          | Select the next search result. Fails if this is the last                        |
 | N          | Select the previous search result. Fails if this is the first                   |
 | *          | Select the next element of the same type. You may use n/N after this. May fail  |
-| [Reg]Y     | Copy the text of the current search result. Defaults to `""`                    |
+| [Reg]Y     | Copy text of selection. Defaults to `""`                                        |
 | [Reg]yy    | Copy the url of the current window. Defaults to `""`                            |
 | ]]         | Click the `next` or `>>` or similar link, to navigate to the next page          |
 | [[         | Click the `prev` or `<<` or similar link, to navigate to the previous page      |
