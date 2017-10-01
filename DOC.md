@@ -52,6 +52,7 @@ Comments begin with `~#` and last until the end of the line. Leading spaces will
 |------------------------|---------------------------------------------------------------------------------|
 | o[String]              | Navigate to a url. If the argument is not a url, google it using google.com/ncr |
 | [Reg/0]p               | Navigate to a url. If the argument is not a url, google it using google.com/ncr |
+| ge[String]             | Edit current url with neovim treating the string a neovim keystrokes            |
 | [Num/0]i[String]       | Select the nth textbox on the page, type the string, and press enter            |
 | /[String]              | Search for a regular expression                                                 |
 | \\[String]             | Search for a css query                                                          |
@@ -73,3 +74,4 @@ Comments begin with `~#` and last until the end of the line. Leading spaces will
 | [Num/0]G               | Go to the bottom of the webpage or nth from last search result                  |
 | [Reg/"]e[String]       | Edit register with neovim. The string will treated as neovim keystrokes         |
 | [Reg/"]ye[String]      | Copy text of selected element, edit with neovim, and output to reg              |
+
