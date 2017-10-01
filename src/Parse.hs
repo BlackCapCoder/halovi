@@ -93,6 +93,10 @@ yankEdit = do
   b <- manyTill anyChar enter
   return $ YankEdit r $ map Chr b
 
+yankEditURL = do
+  string "ge"
+  YankEditURL <$> manyTill (reg <|> fmap Chr anyChar) enter
+
 paste = do
   r <- optional' (pure<$>reg) [Reg '0']
   char 'p'
@@ -119,11 +123,12 @@ comment = do
 
 stmt = choice $ map try
   [ comment
+
   , open, input, quitA, quit, search, query, loop, paste
   , next, prev, find, find', nextPage, prevPage
   , yankText, yankURL, yankAttribute, appText
   , star, rep, goUp, goRoot, goTop, goBottom
-  , edit, yankEdit
+  ,  yankEdit, yankEditURL, edit
 
   , nop
   ]

@@ -40,7 +40,7 @@ yeElcw         ~# edit its text in neovim and output:
                    ~#   go one letter to the left of the end of the next ..
                    ~#   word and replace text from current position until .. 
                    ~#   next word with a linebreak.
-\option⏎<¹An>      ~# For each option element, copy text to the 1 register
+\option⏎<¹An>      ~# For each option element, append text to the 1 register
 e"1pqqgJhr/q2@q⏎   ~# Output result of neovim edit:
                    ~#   paste content of 1 register, start recording macro q,
                    ~#   join current line with the one below, move one step ..

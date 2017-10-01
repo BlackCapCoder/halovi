@@ -28,7 +28,7 @@ data Op = Open Str' | Input Str' | Search Str' | Query Str'
         | Prev | Next | Click
         | NextPage | PrevPage | NextOfType
         | YankText Str | YankURL Str | YankAttribute Str Str'
-        | AppendText Str | YankEdit Str Str'
+        | AppendText Str | YankEdit Str Str' | YankEditURL Str'
         | Edit Str Str'
         | GoUp | GoRoot | GoTop | GoBottom
         | NOP
@@ -163,8 +163,9 @@ str str = do
   return $ concat res
 
 formatURL url
-  | "http://" `isPrefixOf` url = url
-  | "."       `isInfixOf`  url = "http://" ++ url
+  | "http://"  `isPrefixOf` url = url
+  | "https://" `isPrefixOf` url = url
+  | "."        `isInfixOf`  url = "http://" ++ url
   | otherwise = "https://www.google.com/search?pws=0&gl=us&gws_rd=cr&q=" ++ url
 
 ------------
@@ -216,6 +217,12 @@ runOp (YankEdit r v) = do
   inp <- str v
   res <- I.unpack <$> vimEdit' answ inp
   setReg r res
+
+runOp (YankEditURL v) = do
+  Response SUCCESS answ <- msg $ Request EXEC "this.yankURL()"
+  inp <- str v
+  res <- I.unpack <$> vimEdit' answ inp
+  void . msg $ Request EXEC $ "this.open(" ++ show (formatURL res) ++ ")"
 
 
 runOp (Group x) = void . lift . runMaybeT $ forM_ x runOp

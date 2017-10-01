@@ -148,9 +148,13 @@ class Halovi {
   async yankText () {
     let win = this.activeWindow();
     let ret = await win.evaluate(() => {
-      return (useFocus ? document.activeElement
-                       : searchResult[searchIndex]
-             ).innerText;
+      try {
+        return (useFocus ? document.activeElement
+                         : searchResult[searchIndex]
+               ).innerText;
+      } catch (_) {
+        return document.activeElement.innerText;
+      }
     });
     this.output("SUCCESS", ret.toString());
     return 0;

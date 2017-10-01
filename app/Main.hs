@@ -9,7 +9,7 @@ import Control.Monad
 import System.IO
 import System.Exit
 
-versionString = "Version 0.0.1"
+versionString = "Version 0.1"
 programName   = "Halovi" ++ " - " ++ versionString
 
 data Options = Options
