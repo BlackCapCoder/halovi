@@ -23,7 +23,7 @@ enter = choice
 enter' = enter <|> lookAhead (string ">")
 
 terminatedString
-  = manyTill (reg <|> fmap Chr anyChar) enter
+  = manyTill (shortReg <|> fmap Chr anyChar) enter
 
 termString p = choice
   [ pure <$> shortReg >>= (<$> p) . flip id
@@ -42,7 +42,7 @@ normReg = do
   name <- anyChar
   return $ Reg name
 shortReg = do
-  name <- choice $ map char "⁰¹²³⁴⁵⁶⁷⁸⁹"
+  name <- oneOf "⁰¹²³⁴⁵⁶⁷⁸⁹"
   let Just name' = lookup name $ zip "⁰¹²³⁴⁵⁶⁷⁸⁹" "0123456789"
   return $ Reg name'
 reg = normReg <|> shortReg
@@ -83,19 +83,16 @@ yankAttribute = do
 edit = do
   r <- optional' reg $ Reg '"'
   string "e"
-  b <- manyTill anyChar enter
-  return $ Edit r $ map Chr b
-  -- termString . return $ Edit r
+  Edit r <$> terminatedString
 
 yankEdit = do
   r <- optional' reg $ Reg '"'
   string "ye"
-  b <- manyTill anyChar enter
-  return $ YankEdit r $ map Chr b
+  YankEdit r <$> terminatedString
 
 yankEditURL = do
   string "ge"
-  YankEditURL <$> manyTill (reg <|> fmap Chr anyChar) enter
+  YankEditURL <$> terminatedString
 
 paste = do
   r <- optional' (pure<$>reg) [Reg '0']
