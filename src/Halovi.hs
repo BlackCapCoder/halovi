@@ -31,6 +31,7 @@ data Op = Open Str' | Input Str' | Search Str' | Query Str'
         | AppendText Str | YankEdit Str Str' | YankEditURL Str'
         | Edit Str Str'
         | GoUp | GoRoot | GoTop | GoBottom
+        | RegRep Str Op
         | NOP
         deriving Show
 
@@ -228,6 +229,23 @@ runOp (YankEditURL v) = do
 runOp (Group x) = void . lift . runMaybeT $ forM_ x runOp
 runOp (Loop  x) = void . lift . runMaybeT . forever $ forM_ x runOp
 
+runOp (RegRep (Reg r) x) = do
+  val <- lift $ getReg r
+  let num = if all isNumber val then read val else 1
+  runOp (Repeat num x)
+
+
+runOp (Repeat n (Group [Search s, Click])) =
+  when (n > 0) $ do
+    runOp $ Search s
+    runOp $ Repeat (n-1) Next
+    runOp $ Click
+
+runOp (Repeat n (Group [Query s, Click])) =
+  when (n > 0) $ do
+    runOp $ Query s
+    runOp $ Repeat (n-1) Next
+    runOp $ Click
 
 runOp (Repeat n GoTop) = void . msg . Request EXEC $ "this.goTop(" ++ show n ++ ")"
 runOp (Repeat n GoBottom) = void . msg . Request EXEC $ "this.goBottom(" ++ show n ++ ")"

@@ -54,23 +54,30 @@ withReg d f p = do
   p
   return $ f r
 
+regRep q = do
+  r <- optional reg
+  case r of
+    Nothing -> q
+    Just x -> RegRep x <$> q
+
+search = regRep $ termString $ char '/'  >> return Search
+query  = regRep $ termString $ char '\\' >> return Query
+find   = regRep $ termString $ char 'f' >> return (\x -> Group [Search x, Click])
+find'  = regRep $ termString $ char 'F' >> return (\x -> Group [Query x, Click])
 open     = termString $ char 'o'  >> return Open
 input    = termString $ char 'i'  >> return Input
-search   = termString $ char '/'  >> return Search
-query    = termString $ char '\\' >> return Query
-find     = termString $ char 'f' >> return (\x -> Group [Search x, Click])
-find'    = termString $ char 'F' >> return (\x -> Group [Query x, Click])
-quit     = exCmds (words "quit! quit q! q") >> return Quit
+quit     = regRep $ exCmds (words "quit! quit q! q") >> return Quit
 quitA    = exCmds (words "quitall! quitall qall! qall qa! qa") >> return QuitAll
-next     = char 'n' >> return Next
-prev     = char 'N' >> return Prev
-star     = char '*' >> return NextOfType
-nextPage = string "]]" >> return NextPage
-prevPage = string "[[" >> return PrevPage
+click    = regRep $ char 'c' >> return Click
+next     = regRep $ char 'n' >> return Next
+prev     = regRep $ char 'N' >> return Prev
+star     = regRep $ char '*' >> return NextOfType
+nextPage = regRep $ string "]]" >> return NextPage
+prevPage = regRep $ string "[[" >> return PrevPage
 yankText = withReg '"' YankText $ string "Y"
 yankURL  = withReg '"' YankURL  $ string "yy"
-appText  = withReg '"' AppendText $ string "A"
-goUp     = string "gu" >> return GoUp
+appText  = regRep $ withReg '"' AppendText $ string "A"
+goUp     = regRep $ string "gu" >> return GoUp
 goRoot   = string "gU" >> return GoRoot
 goTop    = string "gg" >> return GoTop
 goBottom = string "G" >> return GoBottom
@@ -125,7 +132,7 @@ stmt = choice $ map try
   , next, prev, find, find', nextPage, prevPage
   , yankText, yankURL, yankAttribute, appText
   , star, rep, goUp, goRoot, goTop, goBottom
-  ,  yankEdit, yankEditURL, edit
+  ,  yankEdit, yankEditURL, edit, click
 
   , nop
   ]
