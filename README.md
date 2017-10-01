@@ -27,7 +27,8 @@ fP           ~# Click the first link starting with 'P' (Personer)
 
 A more advanced example:
 ```
-oshirts4mike.com⏎fIR⏎few⏎\img⏎yAs⏎\h1⏎n⏎yeElcw⏎\option⏎<¹An>⏎e"1pqqgJhr/q2@q
+oshirts4mike.com⏎fIR⏎few⏎\img⏎yAs⏎\h1⏎n⏎yeElcw
+⏎\option⏎<¹An>⏎e"1pqqgJhr/q2@q
 ```
 
 ```
@@ -36,7 +37,8 @@ fIR                ~# Click first link containing "IR"
 few                ~# Click first link containing "ew"
 \img⏎yAs           ~# Output src attribute of image element
 \h1⏎n              ~# Select second h1 element and ..
-yeElcw         ~# edit its text in neovim and output:
+yeElcw
+         ~# edit its text in neovim and output:
                    ~#   go one letter to the left of the end of the next ..
                    ~#   word and replace text from current position until .. 
                    ~#   next word with a linebreak.
