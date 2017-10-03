@@ -22,7 +22,7 @@ fP            Click the first link starting with 'P' (Personer)
 
 qg            Record macro `g`
 *             Select next element of same type as the one currently selected
-]]            Go to next page (click the next>> button)
+Y             Append selected element to STDOUT
 @g            Recursively call `g`
 q             Stop recording
 
@@ -30,6 +30,7 @@ qq            Record macro `q`
 "0/           Search for the text in arg0
 Y             Append selected element to STDOUT
 @g            Run the `g` macro
+]]            Go to next page (click the next>> button)
 @q            Recursively call `q`
 q             Stop recording macro `q`
 @q            Run macro `q`
