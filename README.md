@@ -39,3 +39,14 @@ q             Stop recording macro `q`
 # Note
 
 Halovi is far from done; I am not even close to implementing all the features that I want from it!
+
+# Building
+
+```bash
+(cd nm && npm install)
+stack build
+stack install # To install globally
+stack exec halovi -- -f somefile -i somearg # To run without installing
+```
+
+This is going to take a while..
