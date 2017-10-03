@@ -20,10 +20,10 @@ o1881.no      Open http://www.1881.no
 "0i           Write arg0 in the search box and press enter
 fP            Click the first link starting with 'P' (Personer)
 
-qg            Record `g`
-*             Select next element of same type as the one selected
+qg            Record macro `g`
+*             Select next element of same type as the one currently selected
 ]]            Go to next page (click the next>> button)
-@g            Recursive call
+@g            Recursively call `g`
 q             Stop recording
 
 qq            Record macro `q`
@@ -32,6 +32,7 @@ Y             Append selected element to STDOUT
 @g            Run the `g` macro
 @q            Recursively call `q`
 q             Stop recording macro `q`
+@q            Run macro `q`
 ```
 
 # Note
