@@ -4,8 +4,14 @@ Halovi is a vi-like language for web scraping and automation. Upon execution, it
 # Free scrolls
 
 #### Scroll of scraping
+Download every single person from the Norwegian phone book matching some string
 ```
 o1881.no⏎⁰ifP<⁰/Y<*Y>]]
+```
+
+Usage:
+```
+halovi -f file.scroll -i blackcap
 ```
 
 It is equivalent to this:
