@@ -47,6 +47,15 @@ stack exec halovi -- -f somefile -i somearg # To run without installing
 
 This is going to take a while..
 
+#### Dependencies
+
+```bash
+node
+npm
+stack
+neovim # Not currently, but soon-ish
+```
+
 # Note
 
 Halovi is far from done; I am not even close to implementing all the features that I want from it!
