@@ -1,0 +1,16 @@
+flags: {}
+extra-package-dbs: []
+packages:
+- .
+extra-deps:
+- case-insensitive-1.2.0.10
+- hashable-1.2.6.1
+- integer-logarithms-1.0.2
+- megaparsec-6.1.1
+- monad-loops-0.4.3
+- mtl-2.2.1
+- parser-combinators-0.2.0
+- primitive-0.6.2.0
+- scientific-0.3.5.2
+- text-1.2.2.2
+resolver: ghc-8.2

@@ -1,0 +1,4 @@
+.stack-work/
+nm/node_modules/
+nm/package-lock.json
+.git/
