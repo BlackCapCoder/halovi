@@ -18,7 +18,7 @@ It is equivalent to this:
 ```
 o1881.no      Open http://www.1881.no
 "0i           Write arg0 in the search box and press enter
-fP            Click the first link starting with 'P'
+fP            Click the first link starting with 'P' (Personer)
 
 qg            Record `g`
 *             Select next element of same type as the one selected
