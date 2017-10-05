@@ -72,3 +72,4 @@ Comments begin with `~#` and last until the end of the line. Leading spaces will
 | [Num/0]gg              | Go to the top of the webpage or nth search result                               |
 | [Num/0]G               | Go to the bottom of the webpage or nth from last search result                  |
 | [Reg/"]e[String]       | Edit register with neovim. The string will treated as neovim keystrokes         |
+| [Reg/"]ye[String]      | Copy text of selected element, edit with neovim, and output to reg              |

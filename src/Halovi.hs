@@ -28,7 +28,7 @@ data Op = Open Str' | Input Str' | Search Str' | Query Str'
         | Prev | Next | Click
         | NextPage | PrevPage | NextOfType
         | YankText Str | YankURL Str | YankAttribute Str Str'
-        | AppendText Str
+        | AppendText Str | YankEdit Str Str'
         | Edit Str Str'
         | GoUp | GoRoot | GoTop | GoBottom
         | NOP
@@ -118,6 +118,15 @@ vimEdit (Reg r) i = do
     }
   return res
 
+vimEdit' buf i = do
+  reg <- lift $ gets registers
+  res <- liftIO $ N.exec N.Req
+    { registers = uncurry N.Register <$> M.toList reg
+    , input     = i
+    , buffer    = buf
+    }
+  return res
+
 -------------
 
 run deb headful args p = do
@@ -200,6 +209,12 @@ runOp (AppendText r@(Reg n)) = do
 runOp (Edit r v) = do
   text' <- str v
   res   <- I.unpack <$> vimEdit r text'
+  setReg r res
+
+runOp (YankEdit r v) = do
+  Response SUCCESS answ <- msg $ Request EXEC "this.yankText()"
+  inp <- str v
+  res <- I.unpack <$> vimEdit' answ inp
   setReg r res
 
 

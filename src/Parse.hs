@@ -87,6 +87,12 @@ edit = do
   return $ Edit r $ map Chr b
   -- termString . return $ Edit r
 
+yankEdit = do
+  r <- optional' reg $ Reg '"'
+  string "ye"
+  b <- manyTill anyChar enter
+  return $ YankEdit r $ map Chr b
+
 paste = do
   r <- optional' (pure<$>reg) [Reg '0']
   char 'p'
@@ -117,7 +123,7 @@ stmt = choice $ map try
   , next, prev, find, find', nextPage, prevPage
   , yankText, yankURL, yankAttribute, appText
   , star, rep, goUp, goRoot, goTop, goBottom
-  , edit
+  , edit, yankEdit
 
   , nop
   ]
