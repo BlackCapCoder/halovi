@@ -25,9 +25,23 @@ fP           ~# Click the first link starting with 'P' (Personer)
 >            ~# End first loop
 ```
 
-Usage:
+A more advanced example:
 ```
-halovi -f file.scroll -i blackcap
+oshirts4mike.com   ~# Open shirts4mike.com
+fIR                ~# Click first link containing "IR"
+few                ~# Click first link containing "ew"
+\img⏎yAs           ~# Output src attribute of image element
+\h1⏎n              ~# Select second h1 element and ..
+yeElcw         ~# edit its text in neovim and output:
+                   ~#   go one letter to the left of the end of the next ..
+                   ~#   word and replace text from current position until .. 
+                   ~#   next word with a linebreak.
+\option⏎<¹An>      ~# For each option element, copy text to the 1 register
+e"1pqqgJhr/q2@q⏎   ~# Output result of neovim edit:
+                   ~#   paste content of 1 register, start recording macro q,
+                   ~#   join current line with the one below, move one step ..
+                   ~#   left and replace character under cursor with /,
+                   ~#   stop recording macro, and run the q macro twice.
 ```
 
 For more info, see [DOC.md](/DOC.md).
