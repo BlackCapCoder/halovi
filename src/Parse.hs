@@ -86,7 +86,7 @@ paste = do
 
 loop = do
   char '<'
-  fmap Loop . manyTill stmt $ (eof >> return '>') <|> char '>'
+  fmap (Loop . rmNops) . manyTill stmt $ (eof >> return '>') <|> char '>'
 
 rep = do
   num <- some digitChar
@@ -113,9 +113,10 @@ stmt = choice $ map try
   , nop
   ]
 
+rmNops = filter (\case NOP -> False; _ -> True)
 
 parse c
-  | r <- filter (\case NOP -> False; _ -> True) <$> Text.Megaparsec.parse (some stmt) "" c
+  | r <- rmNops <$> Text.Megaparsec.parse (some stmt) "" c
   = case r of
       Left e -> error $ parseErrorPretty' c e
       Right x -> x

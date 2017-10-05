@@ -280,23 +280,24 @@ class Halovi {
     let ret = await win.evaluate(() => {
       let el = (useFocus ? document.activeElement
                          : searchResult[searchIndex]);
-      let r = "";
-      for (let i = 0; i < 10; i++) {
-        let q = el.tagName;
-        if (el.id != "") q += "#" + el.id;
-        if (el)
-          for (let i = 0; i < el.classList.length; i++)
-            q += "." + el.classList[i];
-
-        if (r != "") q += " > ";
-        r = q + r;
-
-        el = el.parentElement;
-        if (el == document.body || el === undefined) break;
-      }
-      return r;
+      el.click();
+      // let r = "";
+      // for (let i = 0; i < 10; i++) {
+      //   let q = el.tagName;
+      //   if (el.id != "") q += "#" + el.id;
+      //   if (el)
+      //     for (let i = 0; i < el.classList.length; i++)
+      //       q += "." + el.classList[i];
+      //
+      //   if (r != "") q += " > ";
+      //   r = q + r;
+      //
+      //   el = el.parentElement;
+      //   if (el == document.body || el === undefined) break;
+      // }
+      // return r;
     });
-    await win.click(ret);
+    // await win.click(ret);
     await win.waitForNavigation();
   }
 

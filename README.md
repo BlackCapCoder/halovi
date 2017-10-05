@@ -10,19 +10,19 @@ o1881.no⏎⁰ifP<⁰/Y<*Y>]]
 ```
 
 ```
-o1881.no      Navigate to http://www.1881.no
-⁰i            Write arg0 in the search box and press enter
-fP            Click the first link starting with 'P' (Personer)
-
-<             Begin loop, break on fail
-  ⁰/          Search for arg0 and select the first result
-  Y           Copy selection to STDOUT
-    <         Begin second loop, break on fail
-      *       Select next element of same type, fails if no more elements
-      Y       Copy selection to STDOUT
-    >         End second loop
-  ]]          Go to next page, by clicking "next" or ">>" or simular
->             End first loop
+o1881.no     ~# Navigate to http://www.1881.no
+⁰i           ~# Write arg0 in the search box and press enter
+fP           ~# Click the first link starting with 'P' (Personer)
+             ~#
+<            ~# Begin loop, break on fail
+  ⁰/         ~# Search for arg0 and select the first result
+  Y          ~# Copy selection to STDOUT
+    <        ~# Begin second loop, break on fail
+      *      ~# Select next element of same type, fails if no more elements
+      Y      ~# Copy selection to STDOUT
+    >        ~# End second loop
+  ]]         ~# Go to next page, by clicking "next" or ">>" or simular
+>            ~# End first loop
 ```
 
 Usage:
