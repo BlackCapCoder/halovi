@@ -42,6 +42,10 @@ If prefixed by a number n, the loop will be executed n times, rather than infini
 
 Any command may be prefixed with a number. This will repeat the command n times.
 
+# Comments
+
+Comments begin with `~#` and last until the end of the line. Leading spaces will be treated as part of the comment.
+
 # Commands
 
 | Command [type/default] | Description                                                                     |
@@ -58,6 +62,8 @@ Any command may be prefixed with a number. This will repeat the command n times.
 | *                      | Select the next element of the same type. You may use n/N after this. May fail  |
 | [Reg/"]Y               | Copy text of selection to register.                                             |
 | [Reg/"]yy              | Copy the url of the current window to register.                                 |
+| [Reg/"]yy              | Copy the url of the current window to register.                                 |
+| [Reg/"]yA[String]      | Find a attribute of selection matching a regex, and yank to register            |
 | ]]                     | Click the `next` or `>>` or similar link, to navigate to the next page          |
 | [[                     | Click the `prev` or `<<` or similar link, to navigate to the previous page      |
 | gu                     | Go up one level                                                                 |

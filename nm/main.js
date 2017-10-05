@@ -100,7 +100,10 @@ class Halovi {
     let ret = await win.evaluate((q) => {
       searchResult = document.querySelectorAll(q);
       searchIndex  = 0;
+
+      searchResult[searchIndex].tabIndex = 0;
       searchResult[searchIndex].focus();
+      useFocus = document.activeElement == searchResult[searchIndex];
     }, q);
   }
 
@@ -116,21 +119,38 @@ class Halovi {
         pat = RegExp(q);
       }
 
-      els = document.querySelectorAll('a');
+      els = document.querySelectorAll('a,span,p');
       res = [];
-      for (let i = 0; i < els.length; i++)
-          if (els[i].innerText.match(pat) !== null)
-              res.push(els[i]);
+
+      for (let i = 0; i < els.length; i++) {
+        if (els[i].innerText.match(pat) !== null) {
+          res.push(els[i]);
+        }
+      }
+
+      for (let x = 0; x < res.length; x++) {
+        let el = res[x];
+        for (let i = res.length-1; i>=0; i--) {
+          if (i==x) continue;
+          if (!res[i].contains(el)) continue;
+          res.splice(i, 1);
+        }
+      }
+
       searchResult = res;
       searchIndex  = 0;
+      searchResult[searchIndex].tabIndex = 0;
       searchResult[searchIndex].focus();
+      useFocus = document.activeElement == searchResult[searchIndex];
     }, q);
   }
 
   async yankText () {
     let win = this.activeWindow();
     let ret = await win.evaluate(() => {
-      return document.activeElement.innerText;
+      return (useFocus ? document.activeElement
+                       : searchResult[searchIndex]
+             ).innerText;
     });
     this.output("SUCCESS", ret.toString());
     return 0;
@@ -138,6 +158,39 @@ class Halovi {
   async yankURL () {
     let win = this.activeWindow();
     let ret = win.url();
+    this.output("SUCCESS", ret.toString());
+    return 0;
+  }
+  async yankAttribute (name) {
+    let win = this.activeWindow();
+    let ret = await win.evaluate(a => {
+      let el = (useFocus ? document.activeElement
+                         : searchResult[searchIndex]);
+
+      if (el.getAttribute(a) !== null)
+        return el.getAttribute(a)
+
+      let pat;
+      let m = a.match(/(.+)\/(.+)/);
+
+      if (m !== null && a[a.length-1] != '/') {
+        pat = RegExp(m[2], m[3]);
+      } else {
+        pat = RegExp(a);
+      }
+
+      let ats = el.getAttributeNames();
+      res = [];
+
+      for (let i = 0; i < ats.length; i++) {
+        if (ats[i].match(pat) !== null) {
+          res.push(ats[i]);
+        }
+      }
+
+      return el.getAttribute(res[0]);
+    }, name);
+
     this.output("SUCCESS", ret.toString());
     return 0;
   }
@@ -162,7 +215,9 @@ class Halovi {
     let ret = await win.evaluate(n => {
       if (searchResult) {
         searchIndex = n;
+        searchResult[searchIndex].tabIndex=0;
         searchResult[searchIndex].focus();
+        useFocus = document.activeElement == searchResult[searchIndex];
       } else {
         window.scrollTo(0,0);
       }
@@ -173,7 +228,9 @@ class Halovi {
     let ret = await win.evaluate(n => {
       if (searchResult) {
         searchIndex = searchResult.length-1-n;
+        searchResult[searchIndex].tabIndex=0;
         searchResult[searchIndex].focus();
+        useFocus = document.activeElement == searchResult[searchIndex];
       } else {
         window.scrollTo(0, document.body.scrollHeight);
       }
@@ -187,7 +244,10 @@ class Halovi {
       if (searchIndex == 0)
         return "No more results";
 
-      searchResult[--searchIndex].focus();
+      searchIndex-=1;
+      searchResult[searchIndex].tabIndex = 0;
+      searchResult[searchIndex].focus();
+      useFocus = document.activeElement == searchResult[searchIndex];
       return "OK"
     });
 
@@ -202,7 +262,10 @@ class Halovi {
       if (searchIndex == searchResult.length-1)
         return "No more results";
 
-      searchResult[++searchIndex].focus();
+      searchIndex+=1;
+      searchResult[searchIndex].tabIndex = 0;
+      searchResult[searchIndex].focus();
+      useFocus = document.activeElement == searchResult[searchIndex];
       return "OK";
     });
 
@@ -215,9 +278,8 @@ class Halovi {
   async click () {
     let win = this.activeWindow();
     let ret = await win.evaluate(() => {
-      // searchResult[searchIndex].click();
-
-      let el = searchResult[searchIndex];
+      let el = (useFocus ? document.activeElement
+                         : searchResult[searchIndex]);
       let r = "";
       for (let i = 0; i < 10; i++) {
         let q = el.tagName;
@@ -234,7 +296,6 @@ class Halovi {
       }
       return r;
     });
-
     await win.click(ret);
     await win.waitForNavigation();
   }
@@ -410,7 +471,10 @@ class Halovi {
           || searchResult[searchIndex].contains(orig)) break;
       }
       if (searchIndex+1 >= searchResult.length) return selector;
-      searchResult[++searchIndex].focus();
+      searchIndex+=1;
+      searchResult[searchIndex].tabIndex=0;
+      searchResult[searchIndex].focus();
+      useFocus = document.activeElement == searchResult[searchIndex];
       return "OK";
     });
 
@@ -418,10 +482,6 @@ class Halovi {
       this.output("FAILURE", ret);
       return 0;
     }
-  }
-
-  async wopenSel () {
-    let win = this.activeWindow();
   }
 
 }

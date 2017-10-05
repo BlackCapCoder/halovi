@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies, LambdaCase #-}
 module Parse where
 
 import Halovi
@@ -17,6 +17,7 @@ enter = choice
   [ eol
   , string "⏎"
   , eof >> return ""
+  , lookAhead (many (char ' ') >> string "~#")
   ]
 
 enter' = enter <|> lookAhead (string ">")
@@ -73,6 +74,11 @@ goRoot   = string "gU" >> return GoRoot
 goTop    = string "gg" >> return GoTop
 goBottom = string "G" >> return GoBottom
 
+yankAttribute = do
+  r <- optional' reg $ Reg '"'
+  string "yA"
+  termString . return $ YankAttribute r
+
 paste = do
   r <- optional' (pure<$>reg) [Reg '0']
   char 'p'
@@ -87,17 +93,29 @@ rep = do
   op  <- stmt
   return $ Repeat (read num) op
 
+nop = choice
+  [ anyChar >> return NOP
+  ]
+
+comment = do
+  string "~#"
+  manyTill anyChar $ eol <|> (eof >> return " ")
+  return NOP
+
 
 stmt = choice $ map try
-  [ open, input, quitA, quit, search, query, loop, paste
+  [ comment
+  , open, input, quitA, quit, search, query, loop, paste
   , next, prev, find, find', nextPage, prevPage
-  , yankText, yankURL
+  , yankText, yankURL, yankAttribute
   , star, rep, goUp, goRoot, goTop, goBottom
+
+  , nop
   ]
 
 
 parse c
-  | r <- Text.Megaparsec.parse (some stmt) "" c
+  | r <- filter (\case NOP -> False; _ -> True) <$> Text.Megaparsec.parse (some stmt) "" c
   = case r of
       Left e -> error $ parseErrorPretty' c e
       Right x -> x

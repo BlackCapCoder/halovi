@@ -5,3 +5,5 @@
 * Windows (waiting for pull request upstream)
 * Visual mode
 * If statements. `[Reg]=[Op]`, run op if reg = selection
+* Ignore errors outside loop?
+* Marks. Selection or url? Both?

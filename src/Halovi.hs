@@ -25,8 +25,9 @@ data Op = Open Str' | Input Str' | Search Str' | Query Str'
         | Loop [Op] | Group [Op] | Repeat Int Op
         | Prev | Next | Click
         | NextPage | PrevPage | NextOfType
-        | YankText Str | YankURL Str
+        | YankText Str | YankURL Str | YankAttribute Str Str'
         | GoUp | GoRoot | GoTop | GoBottom
+        | NOP
         deriving Show
 
 data Str  = Reg Char | Chr Char deriving Show
@@ -94,10 +95,13 @@ sendRequest req = do
 
 msg req = do
   sendRequest req
-  resp <- getResponse
-  case resp of
-    Response FAILURE _ -> mzero
-    _                  -> return resp
+  f
+ where f = do
+         resp <- getResponse
+         case resp of
+           Response FAILURE _ -> mzero
+           Response LOG     _ -> f
+           _                  -> return resp
 
 -------------
 
@@ -143,30 +147,34 @@ formatURL url
 
 runOp (Open url) = do
   url' <- str url
-  void . msg $ Request EXEC $ "this.open(\"" ++ formatURL url' ++ "\")"
+  void . msg $ Request EXEC $ "this.open(" ++ show (formatURL url') ++ ")"
 
 runOp QuitAll = sendRequest $ Request EXEC "this.quitAll()"
 
 runOp (Repeat n (Input text)) = do
   text' <- str text
-  void . msg $ Request EXEC $ "this.input(\"" ++ text' ++ "\", " ++ show n ++ ")"
+  void . msg $ Request EXEC $ "this.input(" ++ show text' ++ ", " ++ show n ++ ")"
 runOp (Input text) = do
   text' <- str text
-  void . msg $ Request EXEC $ "this.input(\"" ++ text' ++ "\", 0)"
+  void . msg $ Request EXEC $ "this.input(" ++ show text' ++ ", 0)"
 
 runOp (Search text) = do
   text' <- str text
-  void . msg $ Request EXEC $ "this.search(\"" ++ text' ++ "\")"
+  void . msg $ Request EXEC $ "this.search(" ++ show text' ++ ")"
 
 runOp (Query text) = do
   text' <- str text
-  void . msg $ Request EXEC $ "this.query(\"" ++ text' ++ "\")"
+  void . msg $ Request EXEC $ "this.query(" ++ show text' ++ ")"
 
 runOp (YankText r) = do
   Response SUCCESS answ <- msg $ Request EXEC "this.yankText()"
   setReg r answ
 runOp (YankURL r) = do
   Response SUCCESS answ <- msg $ Request EXEC "this.yankURL()"
+  setReg r answ
+runOp (YankAttribute r v) = do
+  text' <- str v
+  Response SUCCESS answ <- msg . Request EXEC $ "this.yankAttribute(" ++ show text' ++ ")"
   setReg r answ
 
 
