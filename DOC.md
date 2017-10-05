@@ -61,6 +61,7 @@ Comments begin with `~#` and last until the end of the line. Leading spaces will
 | N                      | Select the previous search result. Fails if this is the first                   |
 | *                      | Select the next element of the same type. You may use n/N after this. May fail  |
 | [Reg/"]Y               | Copy text of selection to register.                                             |
+| [Reg/"]A               | Append text of selection to register.                                           |
 | [Reg/"]yy              | Copy the url of the current window to register.                                 |
 | [Reg/"]yy              | Copy the url of the current window to register.                                 |
 | [Reg/"]yA[String]      | Find a attribute of selection matching a regex, and yank to register            |
@@ -70,3 +71,4 @@ Comments begin with `~#` and last until the end of the line. Leading spaces will
 | gU                     | Go to the root of the webpage                                                   |
 | [Num/0]gg              | Go to the top of the webpage or nth search result                               |
 | [Num/0]G               | Go to the bottom of the webpage or nth from last search result                  |
+| [Reg/"]e[String]       | Edit register with neovim. The string will treated as neovim keystrokes         |
