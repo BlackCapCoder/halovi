@@ -4,10 +4,7 @@ version:             0.1.0.0
 -- description:
 homepage:            https://github.com/githubuser/halovi#readme
 license:             BSD3
-license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2017 Author name here
+author:              BlackCap
 category:            Web
 build-type:          Simple
 extra-source-files:  README.md
@@ -37,15 +34,6 @@ executable halovi
                      , process
   default-language:    Haskell2010
 
-test-suite halovi-test
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             Spec.hs
-  build-depends:       base
-                     , halovi
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  default-language:    Haskell2010
-
 source-repository head
   type:     git
-  location: https://github.com/githubuser/halovi
+  location: https://github.com/blackcapcoder/halovi
