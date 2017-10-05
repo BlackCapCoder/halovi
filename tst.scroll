@@ -8,7 +8,7 @@ yeElcw         ~# edit its text in neovim and output:
                    ~#   word and replace text from current position until .. 
                    ~#   next word with a linebreak.
 \option⏎<¹An>      ~# For each option element, copy text to the 1 register
-e"1pqqgJhr/q2@q⏎   ~# Output result of neovim edit:
+e"1pqqgJhr/q2@q    ~# Output result of neovim edit:
                    ~#   paste content of 1 register, start recording macro q,
                    ~#   join current line with the one below, move one step ..
                    ~#   left and replace character under cursor with /,

@@ -27,6 +27,10 @@ fP           ~# Click the first link starting with 'P' (Personer)
 
 A more advanced example:
 ```
+oshirts4mike.com⏎fIR⏎few⏎\img⏎yAs⏎\h1⏎n⏎yeElcw⏎\option⏎<¹An>⏎e"1pqqgJhr/q2@q
+```
+
+```
 oshirts4mike.com   ~# Open shirts4mike.com
 fIR                ~# Click first link containing "IR"
 few                ~# Click first link containing "ew"
