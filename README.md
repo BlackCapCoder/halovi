@@ -36,8 +36,9 @@ For more info, see [DOC.md](/DOC.md).
 
 ```bash
 (cd nm && npm install)
+pip install neovim
 stack build
-stack install # To install globally
+stack install # To install Halovi globally
 stack exec halovi -- -f somefile -i somearg # To run without installing
 ```
 
@@ -49,7 +50,9 @@ This is going to take a while..
 node
 npm
 stack
-neovim # Not currently, but soon-ish
+neovim
+python3
+neovim (python)
 ```
 
 # Note

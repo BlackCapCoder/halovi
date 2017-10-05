@@ -49,8 +49,8 @@ reg = normReg <|> shortReg
 
 optional' o f = fromMaybe f <$> optional o
 
-withReg f p = do
-  r <- optional' reg $ Reg '"'
+withReg d f p = do
+  r <- optional' reg $ Reg d
   p
   return $ f r
 
@@ -67,8 +67,9 @@ prev     = char 'N' >> return Prev
 star     = char '*' >> return NextOfType
 nextPage = string "]]" >> return NextPage
 prevPage = string "[[" >> return PrevPage
-yankText = withReg YankText $ string "Y"
-yankURL  = withReg YankURL  $ string "yy"
+yankText = withReg '"' YankText $ string "Y"
+yankURL  = withReg '"' YankURL  $ string "yy"
+appText  = withReg '"' AppendText $ string "A"
 goUp     = string "gu" >> return GoUp
 goRoot   = string "gU" >> return GoRoot
 goTop    = string "gg" >> return GoTop
@@ -78,6 +79,13 @@ yankAttribute = do
   r <- optional' reg $ Reg '"'
   string "yA"
   termString . return $ YankAttribute r
+
+edit = do
+  r <- optional' reg $ Reg '"'
+  string "e"
+  b <- manyTill anyChar enter
+  return $ Edit r $ map Chr b
+  -- termString . return $ Edit r
 
 paste = do
   r <- optional' (pure<$>reg) [Reg '0']
@@ -107,8 +115,9 @@ stmt = choice $ map try
   [ comment
   , open, input, quitA, quit, search, query, loop, paste
   , next, prev, find, find', nextPage, prevPage
-  , yankText, yankURL, yankAttribute
+  , yankText, yankURL, yankAttribute, appText
   , star, rep, goUp, goRoot, goTop, goBottom
+  , edit
 
   , nop
   ]

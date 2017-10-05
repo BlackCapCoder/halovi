@@ -1,6 +1,8 @@
 {-# LANGUAGE LambdaCase, DeriveGeneric, DuplicateRecordFields #-}
 module Halovi where
 
+import qualified Nvim as N
+
 import System.Process
 import System.IO
 import Control.Monad
@@ -26,6 +28,8 @@ data Op = Open Str' | Input Str' | Search Str' | Query Str'
         | Prev | Next | Click
         | NextPage | PrevPage | NextOfType
         | YankText Str | YankURL Str | YankAttribute Str Str'
+        | AppendText Str
+        | Edit Str Str'
         | GoUp | GoRoot | GoTop | GoBottom
         | NOP
         deriving Show
@@ -103,6 +107,17 @@ msg req = do
            Response LOG     _ -> f
            _                  -> return resp
 
+
+vimEdit (Reg r) i = do
+  reg <- lift $ gets registers
+  buf <- lift $ getReg r
+  res <- liftIO $ N.exec N.Req
+    { registers = uncurry N.Register <$> M.toList reg
+    , input     = i
+    , buffer    = buf
+    }
+  return res
+
 -------------
 
 run deb headful args p = do
@@ -176,6 +191,16 @@ runOp (YankAttribute r v) = do
   text' <- str v
   Response SUCCESS answ <- msg . Request EXEC $ "this.yankAttribute(" ++ show text' ++ ")"
   setReg r answ
+runOp (AppendText r@(Reg n)) = do
+  Response SUCCESS answ <- msg $ Request EXEC "this.yankText()"
+  old <- lift $ getReg n
+  setReg r $ if old == "" then answ
+                         else old ++ "\n" ++ answ
+
+runOp (Edit r v) = do
+  text' <- str v
+  res   <- I.unpack <$> vimEdit r text'
+  setReg r res
 
 
 runOp (Group x) = void . lift . runMaybeT $ forM_ x runOp
