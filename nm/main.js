@@ -109,7 +109,7 @@ class Halovi {
 
   async search (q) {
     let win = this.activeWindow();
-    let ret = await win.evaluate((q) => {
+      let ret = await win.evaluate((q) => {
       let pat;
       let m = q.match(/(.+)\/(.+)/);
 
@@ -119,13 +119,19 @@ class Halovi {
         pat = RegExp(q);
       }
 
-      els = document.querySelectorAll('a,span,p');
+      searches = ['a,span,p', '*'];
       res = [];
 
-      for (let i = 0; i < els.length; i++) {
-        if (els[i].innerText.match(pat) !== null) {
-          res.push(els[i]);
+      for (let i = 0; i < searches.length; i++) {
+        els = document.querySelectorAll(searches[i]);
+
+        for (let i = 0; i < els.length; i++) {
+          if (els[i].innerText && els[i].innerText.match(pat) !== null) {
+            res.push(els[i]);
+          }
         }
+
+        if (res.length > 0) break;
       }
 
       for (let x = 0; x < res.length; x++) {
