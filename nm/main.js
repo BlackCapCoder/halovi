@@ -137,13 +137,8 @@ class Halovi {
   }
 
   async search (q) {
-<<<<<<< HEAD
     let win = await this.activeWindow();
     let ret = await win.evaluate((q) => {
-=======
-    let win = this.activeWindow();
-      let ret = await win.evaluate((q) => {
->>>>>>> c44d15c7454d016a8d908cea1a4e1cc3844ccf7d
       let pat;
       let m = q.match(/(.+)\/(.+)/);
 

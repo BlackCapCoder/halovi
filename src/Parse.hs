@@ -9,6 +9,7 @@ import Text.Megaparsec.Char
 import Text.Megaparsec.Expr
 import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Maybe
+import Debug.Trace
 
 type Parser = Parsec Void String
 
@@ -78,7 +79,7 @@ nextPage = regRep $ string "]]" >> return NextPage
 prevPage = regRep $ string "[[" >> return PrevPage
 yankText = withReg '"' YankText $ string "Y"
 yankURL  = withReg '"' YankURL  $ string "yy"
-appText  = regRep $ withReg '"' AppendText $ string "A"
+appText  = withReg '"' AppendText $ string "A"
 goUp     = regRep $ string "gu" >> return GoUp
 goRoot   = string "gU" >> return GoRoot
 goTop    = string "gg" >> return GoTop

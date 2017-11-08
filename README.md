@@ -27,27 +27,32 @@ fP           ~# Click the first link starting with 'P' (Personer)
 
 A more advanced example:
 ```
-oshirts4mike.com⏎fIR⏎few⏎\img⏎yAs⏎\h1⏎n⏎yeElcw
-⏎\option⏎<¹An>⏎e"1pqqgJhr/q2@q
+oshirts4mike.com⏎fIR⏎/ew⏎<C\img⏎yAs⏎\h1⏎nyeElcw<CR>
+\option⏎¹Y<n¹A>e"1pqqgJhr/q2@qo⏎ZQn>
 ```
 
 ```
 oshirts4mike.com   ~# Open shirts4mike.com
-fIR                ~# Click first link containing "IR"
-few                ~# Click first link containing "ew"
-\img⏎yAs           ~# Output src attribute of image element
-\h1⏎n              ~# Select second h1 element and ..
-yeElcw
-         ~# edit its text in neovim and output:
+fIR                ~# Click "SHIRTS"
+/ew                ~# Search for "ew", for each result ..
+< C                ~# Click selection, opening in a new window
+  \img⏎yAs         ~# Output the src attribute of image
+  \h1⏎n            ~# Select second h1 element and ..
+  yeElcw<CR>       ~# edit its text in neovim and output:
                    ~#   go one letter to the left of the end of the next ..
                    ~#   word and replace text from current position until .. 
                    ~#   next word with a linebreak.
-\option⏎<¹An>      ~# For each option element, append text to the 1 register
-e"1pqqgJhr/q2@q⏎   ~# Output result of neovim edit:
+  \option          ~# Search for option elements
+  ¹Y               ~# Copy text to "1 and ..
+  <n¹A>            ~# Append the text of all the other option elements on the page to "1
+  e"1pqqgJhr/q2@qo ~# Output the result of the neovim edit:
                    ~#   paste content of 1 register, start recording macro q,
                    ~#   join current line with the one below, move one step ..
                    ~#   left and replace character under cursor with /,
-                   ~#   stop recording macro, and run the q macro twice.
+                   ~#   stop recording macro, run the q macro twice, and
+                   ~#   open a new line at the end of the buffer
+  ZQ               ~# Close window
+  n >              ~# Go to the next "ew" result, if any
 ```
 
 For more info, see [DOC.md](/DOC.md).

@@ -154,7 +154,7 @@ run deb headful args p = do
     void $ runMaybeT $ do
       whileM_ ((READY/=).respCode <$> getResponse) (return ())
       when deb . liftIO $ putStrLn "GOT READY"
-      mapM_ runOp p
+      mapM_ (\x -> {- liftIO (print x) >> -} runOp x) p
       runOp QuitAll
 
 
@@ -237,7 +237,7 @@ runOp (Loop  x) = void . lift . runMaybeT . forever $ forM_ x runOp
 
 runOp (RegRep (Reg r) x) = do
   val <- lift $ getReg r
-  let num = if all isNumber val then read val else 1
+  let num = if all isNumber val && (not $ null val) then read val else 1
   runOp (Repeat num x)
 
 

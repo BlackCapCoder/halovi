@@ -39,7 +39,7 @@ exec r = do
     <- createProcess (proc "python" ["nvim/pipe.py"])
                      { std_in  = CreatePipe
                      , std_out = CreatePipe }
-
+  -- print r
   I.hPutStr inp . L.toStrict $ encode r
   hClose inp
   I.hGetContents out
