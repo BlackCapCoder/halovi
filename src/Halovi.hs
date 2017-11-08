@@ -1,43 +1,46 @@
-{-# LANGUAGE LambdaCase, DeriveGeneric, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE LambdaCase            #-}
 module Halovi where
 
-import qualified Nvim as N
+import qualified Nvim                      as N
 
-import System.Process
-import System.IO
-import Control.Monad
-import Control.Monad.Loops
-import Data.List
-import Data.Maybe
-import Control.Monad.Trans
-import Control.Monad.Trans.Maybe
-import Control.Monad.Trans.State
-import Control.Monad.IO.Class
-import qualified Data.Map as M
-import Data.Aeson
-import GHC.Generics
-import qualified Data.ByteString as T
-import qualified Data.ByteString.Lazy as L
-import qualified Data.ByteString.Char8 as I
-import Data.Char
+import           Control.Monad
+import           Control.Monad.IO.Class
+import           Control.Monad.Loops
+import           Control.Monad.Trans
+import           Control.Monad.Trans.Maybe
+import           Control.Monad.Trans.State
+import           Data.Aeson
+import qualified Data.ByteString           as T
+import qualified Data.ByteString.Char8     as I
+import qualified Data.ByteString.Lazy      as L
+import           Data.Char
+import           Data.List
+import qualified Data.Map                  as M
+import           Data.Maybe
+import           GHC.Generics
+import           System.IO
+import           System.Process
 
-
-data Op = Open Str' | Input Str' | Search Str' | Query Str'
-        | Quit | QuitAll
-        | Loop [Op] | Group [Op] | Repeat Int Op
-        | Prev | Next | Click
-        | NextPage | PrevPage | NextOfType
-        | YankText Str | YankURL Str | YankAttribute Str Str'
-        | AppendText Str | YankEdit Str Str' | YankEditURL Str'
+data Op = AppendText Str   | Click                  | SClick
         | Edit Str Str'
-        | GoUp | GoRoot | GoTop | GoBottom
-        | RegRep Str Op
-        | NOP
+        | GoBack           | GoBottom               | GoForward
+        | GoRoot           | GoTop                  | GoUp
+        | Group [Op]       | Input Str'             | Loop [Op]
+        | NOP              | Next                   | NextOfType
+        | NextPage         | Open Str'              | WinOpen Str'
+        | Prev
+        | PrevPage         | Query Str'             | Quit
+        | QuitAll          | RegRep Str Op          | Repeat Int Op
+        | Search Str'      | YankAttribute Str Str' | YankEdit Str Str'
+        | YankEditURL Str' | YankText Str           | YankURL Str
+        | ClosePage
         deriving Show
 
-data Str  = Reg Char | Chr Char deriving Show
-type Str' = [Str]
-type Program  = [Op]
+data Str     = Reg Char | Chr Char deriving Show
+type Str'    = [Str]
+type Program = [Op]
 
 data PState = PState
   { registers :: M.Map Char String
@@ -86,8 +89,7 @@ getResponse = do
 
   case decode $ L.fromStrict ln of
     Just x -> return x
-    _   -> do
-      getResponse
+    _      -> getResponse
 
 sendRequest req = do
   inp <- lift $ gets hInput
@@ -175,6 +177,10 @@ runOp (Open url) = do
   url' <- str url
   void . msg $ Request EXEC $ "this.open(" ++ show (formatURL url') ++ ")"
 
+runOp (WinOpen url) = do
+  url' <- str url
+  void . msg $ Request EXEC $ "this.winOpen(" ++ show (formatURL url') ++ ")"
+
 runOp QuitAll = sendRequest $ Request EXEC "this.quitAll()"
 
 runOp (Repeat n (Input text)) = do
@@ -257,4 +263,3 @@ runOp (Repeat n o) = void . forM_ [1..n] . const $ runOp o
 
 runOp x | (h:r) <- show x
         = void . msg . Request EXEC $ "this." ++ toLower h : r ++ "()"
-

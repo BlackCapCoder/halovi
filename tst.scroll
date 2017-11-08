@@ -1,0 +1,9 @@
+oshirts4mike.com   ~# Open shirts4mike.com
+fIR                ~# Click "SHIRTS"
+/ew                ~# Search for "ew", for each result ..
+< C                ~# Click, opening in a new window
+  \img⏎yAs         ~# Output the src attribute of image
+  \h1⏎nY           ~# Output text of second h1 tag
+  \option⏎<Yn>     ~# Output text of all option elements
+  ZQn >            ~# Close window, next "ew" result
+

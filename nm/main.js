@@ -7,7 +7,6 @@ class Halovi {
     const args       = process.argv.slice(2);
     const isHeadless = !args.includes('headful');
 
-    this.windows = [];
     (async () => {
       this.browser = await puppeteer.launch({args: ['--no-sandbox'], headless: isHeadless});
       await this.createPage();
@@ -17,7 +16,6 @@ class Halovi {
 
   async createPage () {
     const page = await this.browser.newPage();
-    this.windows.push(page);
   }
 
   output (code = 'SUCCESS', msg = '') {
@@ -28,7 +26,10 @@ class Halovi {
   }
   log (msg) { this.output("LOG", msg); }
 
-  activeWindow () { return this.windows[this.windows.length-1]; }
+  async activeWindow () {
+    let ps = await this.browser.pages();
+    return ps[ps.length-1];
+  }
 
 
   async run (code) {
@@ -53,20 +54,25 @@ class Halovi {
   // ---------
 
   async quit () {
-    if (this.windows.length   > 0) this.windows.pop();
-    if (this.windows.length === 0) await this.browser.close();
+    // if (this.windows.length   > 0) this.windows.pop();
+    // if (this.windows.length === 0) await this.browser.close();
+    await this.browser.close();
   }
   async quitAll () { await this.browser.close(); }
 
 
   async open (url) {
-    const win = this.activeWindow();
+    const win = await this.activeWindow();
     await win.goto(url);
     // await page.screenshot({path: 'tst.png'});
   }
+  async winOpen (url) {
+    await this.createPage ()
+    await this.open(url)
+  }
 
   async input (txt, n) {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
 
     const status = await win.evaluate(n => {
       var filterVisible = function (els) {
@@ -85,7 +91,6 @@ class Halovi {
       el.setSelectionRange(0, el.value.length);
       return "OK";
     }, n);
-
     if (status !== "OK") {
       this.output("FAILURE", status);
       return 0;
@@ -96,10 +101,34 @@ class Halovi {
   }
 
   async query (q) {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate((q) => {
-      searchResult = document.querySelectorAll(q);
+      var old = (window["searchResult"] !== undefined
+             &&  window["searchIndex"] !== undefined)
+              ? searchResult[searchIndex] : undefined;
+      searchResult = Array.from(document.querySelectorAll(q));
       searchIndex  = 0;
+
+      // searchResult.sort((a,b) => {
+      //   let x = a.getBoundingClientRect();
+      //   let y = b.getBoundingClientRect();
+      //   if (x.y < y.y) return -1;
+      //   if (x.y > y.y) return  1;
+      //   return 0;
+      // });
+      //
+      // if (old !== undefined) {
+      //   for (; searchIndex < searchResult.length; searchIndex++) {
+      //     if (old == searchResult[searchIndex]) {
+      //       searchIndex++; break;
+      //     }
+      //
+      //     let x = old.getBoundingClientRect();
+      //     let y = searchResult[searchIndex].getBoundingClientRect();
+      //
+      //     if (x.y < y.y) break;
+      //   }
+      // }
 
       searchResult[searchIndex].tabIndex = 0;
       searchResult[searchIndex].focus();
@@ -108,8 +137,13 @@ class Halovi {
   }
 
   async search (q) {
+<<<<<<< HEAD
+    let win = await this.activeWindow();
+    let ret = await win.evaluate((q) => {
+=======
     let win = this.activeWindow();
       let ret = await win.evaluate((q) => {
+>>>>>>> c44d15c7454d016a8d908cea1a4e1cc3844ccf7d
       let pat;
       let m = q.match(/(.+)\/(.+)/);
 
@@ -152,7 +186,7 @@ class Halovi {
   }
 
   async yankText () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate(() => {
       try {
         return (useFocus ? document.activeElement
@@ -166,13 +200,13 @@ class Halovi {
     return 0;
   }
   async yankURL () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = win.url();
     this.output("SUCCESS", ret.toString());
     return 0;
   }
   async yankAttribute (name) {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate(a => {
       let el = (useFocus ? document.activeElement
                          : searchResult[searchIndex]);
@@ -206,7 +240,7 @@ class Halovi {
   }
 
   async goUp () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let rx  = /(.*((\/.+)*))(\/.+)/;
     let rs  = rx.exec(win.url());
     if (rs === null || rs[1] === null || rs[1] == "http:/" || rs[1] == "https:/")
@@ -214,14 +248,14 @@ class Halovi {
     await win.goto(rs[1]);
   }
   async goRoot () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let rx  = /(https?:\/\/)?[^\/]+/;
     let rs  = rx.exec(win.url());
     if (rs === null) return;
     await win.goto(rs[0]);
   }
   async goTop (n=0) {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate(n => {
       if (searchResult) {
         searchIndex = n;
@@ -234,14 +268,18 @@ class Halovi {
     }, n);
   }
   async goBottom (n=0) {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate(n => {
-      if (searchResult) {
-        searchIndex = searchResult.length-1-n;
-        searchResult[searchIndex].tabIndex=0;
-        searchResult[searchIndex].focus();
-        useFocus = document.activeElement == searchResult[searchIndex];
-      } else {
+      try {
+        if (searchResult) {
+          searchIndex = searchResult.length-1-n;
+          searchResult[searchIndex].tabIndex=0;
+          searchResult[searchIndex].focus();
+          useFocus = document.activeElement == searchResult[searchIndex];
+        } else {
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+      } catch (e) {
         window.scrollTo(0, document.body.scrollHeight);
       }
     }, n);
@@ -249,7 +287,7 @@ class Halovi {
 
 
   async prev () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate(() => {
       if (searchIndex == 0)
         return "No more results";
@@ -267,7 +305,7 @@ class Halovi {
     }
   }
   async next () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate(() => {
       if (searchIndex == searchResult.length-1)
         return "No more results";
@@ -285,8 +323,10 @@ class Halovi {
     }
   }
 
+
+
   async click () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate(() => {
       let el = (useFocus ? document.activeElement
                          : searchResult[searchIndex]);
@@ -307,13 +347,34 @@ class Halovi {
       // }
       // return r;
     });
-    // await win.click(ret);
+    try {
+      // await win.click(ret);
+      await win.waitForNavigation({waitUntil: 'networkidle'});
+    } catch (ex) {}
+
     await win.waitForNavigation();
+  }
+
+  async sClick () {
+    let win = await this.activeWindow();
+    let ret = await win.evaluate(() => {
+      let el = (useFocus ? document.activeElement
+                         : searchResult[searchIndex]);
+
+      for (let i = 0; i < 100; i++) {
+        if (el.tagName == 'A') break;
+        el = el.parentElement;
+      }
+
+      el.setAttribute('target', '_blank');
+      el.click();
+    });
+    await win.waitFor(1000); // TODO
   }
 
   // Stolen from vimium
   async switchPage (pattern, rel) {
-    await this.activeWindow().evaluate(args => {
+    await await this.activeWindow().evaluate(args => {
       const followLink = el => {
         if (el.nodeName.toLowerCase() == "link") {
           window.location.href = el.href;
@@ -442,7 +503,7 @@ class Halovi {
   }
 
   async nextPage () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     const pat = "next,more,newer,>,›,→,»,≫,>>"
               . split(",").filter( s => s.trim().length);
     this.switchPage(pat, 'next');
@@ -450,15 +511,34 @@ class Halovi {
   }
 
   async prevPage () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     const pat = "prev,previous,back,older,<,‹,←,«,≪,<<"
               . split(",").filter( s => s.trim().length);
     this.switchPage(pat, 'prev');
     await win.waitForNavigation();
   }
 
+  async goBack () {
+    let win = await this.activeWindow();
+    try {
+      await win.goBack({timeout: 2});
+    } catch (e) {}
+    // let ret = await win.evaluate(() => {
+    //   window.history.back();
+    // });
+    // await win.waitForNavigation({waitUntil: 'networkidle'});
+  }
+  async goForward () {
+    let win = await this.activeWindow();
+    // let ret = await win.evaluate(() => {
+    //   window.history.forward();
+    // });
+    await win.goForward();
+    // await win.waitForNavigation({waitUntil: 'networkidle'});
+  }
+
   async nextOfType () {
-    let win = this.activeWindow();
+    let win = await this.activeWindow();
     let ret = await win.evaluate(() => {
       orig = searchResult[searchIndex];
       selection = orig;
@@ -493,6 +573,25 @@ class Halovi {
       this.output("FAILURE", ret);
       return 0;
     }
+
+    try {
+      await win.waitForNavigation(
+        { waitUntil: 'networkidle'
+        , networkIdleTimeout: 10
+        , timeout: 2
+        }
+      );
+    } catch (ex) {}
+  }
+
+  async closePage () {
+    let ps  = await this.browser.pages();
+    // console.log(ps.length)
+    let win = await this.activeWindow();
+    await win.close();
+    await win.waitFor(1); // TODO
+    ps  = await this.browser.pages();
+    // console.log(ps.length)
   }
 
 }

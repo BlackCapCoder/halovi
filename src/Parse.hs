@@ -65,10 +65,12 @@ query  = regRep $ termString $ char '\\' >> return Query
 find   = regRep $ termString $ char 'f' >> return (\x -> Group [Search x, Click])
 find'  = regRep $ termString $ char 'F' >> return (\x -> Group [Query x, Click])
 open     = termString $ char 'o'  >> return Open
+winOpen  = termString $ char 't'  >> return WinOpen
 input    = termString $ char 'i'  >> return Input
 quit     = regRep $ exCmds (words "quit! quit q! q") >> return Quit
 quitA    = exCmds (words "quitall! quitall qall! qall qa! qa") >> return QuitAll
 click    = regRep $ char 'c' >> return Click
+sclick   = regRep $ char 'C' >> return SClick
 next     = regRep $ char 'n' >> return Next
 prev     = regRep $ char 'N' >> return Prev
 star     = regRep $ char '*' >> return NextOfType
@@ -81,6 +83,9 @@ goUp     = regRep $ string "gu" >> return GoUp
 goRoot   = string "gU" >> return GoRoot
 goTop    = string "gg" >> return GoTop
 goBottom = string "G" >> return GoBottom
+goBack    = string "gb" >> return GoBack
+goForward = string "gf" >> return GoForward
+closePage = string "ZQ" >> return ClosePage
 
 yankAttribute = do
   r <- optional' reg $ Reg '"'
@@ -128,11 +133,12 @@ comment = do
 stmt = choice $ map try
   [ comment
 
-  , open, input, quitA, quit, search, query, loop, paste
+  , open, winOpen, input, quitA, quit, search, query, loop, paste
   , next, prev, find, find', nextPage, prevPage
   , yankText, yankURL, yankAttribute, appText
-  , star, rep, goUp, goRoot, goTop, goBottom
-  ,  yankEdit, yankEditURL, edit, click
+  , star, rep, goUp, goRoot, goTop, goBottom, goBack, goForward
+  , yankEdit, yankEditURL, edit, click, sclick
+  , closePage
 
   , nop
   ]
