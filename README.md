@@ -29,7 +29,7 @@ fP           ~# Click the first link starting with 'P' (Personer)
 A more advanced example:
 ```
 oshirts4mike.com⏎fIR⏎/ew⏎<C\img⏎yAs⏎\h1⏎nyeElcw<CR>
-\option⏎¹Y<n¹A>e"1pqqgJhr/q2@qo⏎ZQn>
+\option⏎¹Y<n¹A>e"1pqqgJhr/q2@qo⏎ZQn
 ```
 
 ```
