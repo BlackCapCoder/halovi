@@ -3,7 +3,7 @@ Halovi is a vi-like language for web scraping and automation. Upon execution it 
 
 # Free scrolls
 
-#### Scroll of scraping
+#### Scroll of stalking
 Downloads every single person from the Norwegian phone book matching some string
 ```
 o1881.no⏎⁰ifP<⁰/Y<*Y>]]
@@ -25,6 +25,7 @@ fP           ~# Click the first link starting with 'P' (Personer)
 >            ~# End first loop
 ```
 
+#### Scroll of scraping
 A more advanced example:
 ```
 oshirts4mike.com⏎fIR⏎/ew⏎<C\img⏎yAs⏎\h1⏎nyeElcw<CR>
