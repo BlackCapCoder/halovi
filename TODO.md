@@ -2,7 +2,7 @@
 * Ability to prefix loop with a register and ..
 * Macros
 * <s>Edit input field/register with neovim</s>
-* Windows (waiting for pull request upstream)
+* <s>Windows (waiting for pull request upstream)</s>
 * Visual mode
 * If statements. `[Reg]=[Op]`, run op if reg = selection
 * Ignore errors outside loop?
