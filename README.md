@@ -1,6 +1,8 @@
 # Halovi
 Halovi is a vi-like language for web scraping and automation. Upon execution it will read a scroll of alien language, summoning headless browsers and neovims to perform dark magic on webpages. That's pretty spooky, thus halovi (as in Halloween).
 
+See [DOC.md](/DOC.md) for a language specification, [TIPS.md](/TIPS.md) for tips on how to write programs, or read below for example programs.
+
 # Free scrolls
 
 #### Scroll of stalking
@@ -119,8 +121,6 @@ ei%Friends
 >
 ```
 
-For more info, see [DOC.md](/DOC.md) for a language specification, and [TIPS.md](/TIPS.md) for tips on how to write programs.
-
 # Building
 
 ```bash
@@ -143,9 +143,3 @@ neovim
 python3
 neovim (python)
 ```
-
-# Note
-
-Halovi is far from done; I am not even close to implementing all the features that I want from it! See [TODO.md](/TODO.md) and feel free to post feature requests.
-
-I actually use this language, and I implement stuff I miss when I need it
