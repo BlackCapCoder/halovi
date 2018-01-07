@@ -18,7 +18,8 @@ enter = choice
   [ eol
   , string "⏎"
   , eof >> return ""
-  , lookAhead (many (char ' ') >> string "~#")
+  -- , lookAhead (many (char ' ') >> string "~#")
+  , lookAhead (string "~#")
   ]
 
 enter' = enter <|> lookAhead (string ">")
@@ -150,4 +151,4 @@ parse c
   | r <- rmNops <$> Text.Megaparsec.parse (some stmt) "" c
   = case r of
       Left e -> error $ parseErrorPretty' c e
-      Right x -> x
+      Right x -> {- trace (show x) $ -} x

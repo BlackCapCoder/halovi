@@ -56,6 +56,69 @@ fIR                ~# Click "SHIRTS"
   n >              ~# Go to the next "ew" result, if any
 ```
 
+#### Scroll of mating
+This is a more real world example. It logs into Facebook and for each link in a file, check if the person is female and if so, grab random information about her and her entire friends list.
+```
+~# Log into facebook
+ofacebook.com
+\#email
+iYOUR EMAIL HERE
+\#pass
+iYOUR PASSWORD HERE
+
+~# For each person on my list
+<"0e:%!head fblinks -n 1 && sed -i '1d' fblinks<CR>
+ o⁰
+
+~# Make sure it is a female
+1</To see what she shares
+
+~# Output data for easy parsing and link to facebook page
+""ei%Person<CR>⁰
+
+~# Name
+\#fb-timeline-cover-name
+""ei%Name
+""Y
+
+~# Profile pic
+\#fbTimelineHeadline .profilePic
+""ei%ProfilePic
+""yAsrc
+
+~# Date of last post
+1<
+ \#recent_capsule_container abbr[data-utime]
+ ""ei%TimeOfLastPost
+ ""yAdata-utime
+>
+
+~# Go to the about page
+fAbout
+""ei%About
+
+~# Overview
+1<
+ \div[data-overviewsection]>div>div>div
+ <""Yn>
+>
+
+~# Go to the friends page
+Fa[data-tab-key=friends]
+""ei%Friends
+
+1<
+ ~# Load all friends
+ G<\#timeline-medley ul+img:last-child
+  >
+
+ ~# List all friends
+ \#timeline-medley a[data-gt]
+   <""Y""yAhref
+    n>
+>
+```
+
 For more info, see [DOC.md](/DOC.md).
 
 # Building

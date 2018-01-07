@@ -22,6 +22,7 @@ import           Data.Maybe
 import           GHC.Generics
 import           System.IO
 import           System.Process
+import           Debug.Trace
 
 data Op = AppendText Str   | Click                  | SClick
         | Edit Str Str'
@@ -94,6 +95,7 @@ getResponse = do
 sendRequest req = do
   inp <- lift $ gets hInput
   deb <- lift $ gets debug
+  -- when deb . liftIO . putStr $ reqMsg req
   when deb . liftIO . I.putStrLn . L.toStrict $ encode req
 
   liftIO $ do
@@ -140,6 +142,9 @@ run deb headful args p = do
     <- createProcess (proc "node" nodeArgs)
                      { std_in  = CreatePipe
                      , std_out = CreatePipe }
+
+  hSetEncoding inp utf8
+  hSetEncoding out utf8
 
   let st = PState
         { registers = M.fromList $ zip (show =<< [0..9]) args
@@ -188,7 +193,7 @@ runOp (Repeat n (Input text)) = do
   void . msg $ Request EXEC $ "this.input(" ++ show text' ++ ", " ++ show n ++ ")"
 runOp (Input text) = do
   text' <- str text
-  void . msg $ Request EXEC $ "this.input(" ++ show text' ++ ", 0)"
+  void . msg $ Request EXEC $ "this.input(`" ++ text' ++ "`, 0)"
 
 runOp (Search text) = do
   text' <- str text
@@ -216,19 +221,19 @@ runOp (AppendText r@(Reg n)) = do
 
 runOp (Edit r v) = do
   text' <- str v
-  res   <- I.unpack <$> vimEdit r text'
+  res   <- vimEdit r text'
   setReg r res
 
 runOp (YankEdit r v) = do
   Response SUCCESS answ <- msg $ Request EXEC "this.yankText()"
   inp <- str v
-  res <- I.unpack <$> vimEdit' answ inp
+  res <- vimEdit' answ inp
   setReg r res
 
 runOp (YankEditURL v) = do
   Response SUCCESS answ <- msg $ Request EXEC "this.yankURL()"
   inp <- str v
-  res <- I.unpack <$> vimEdit' answ inp
+  res <- vimEdit' answ inp
   void . msg $ Request EXEC $ "this.open(" ++ show (formatURL res) ++ ")"
 
 

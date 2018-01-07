@@ -33,14 +33,17 @@ test = Req
 
 keyEscape = 27
 
-exec :: Req -> IO I.ByteString
+exec :: Req -> IO String -- I.ByteString
 exec r = do
   (Just inp, Just out, err, ph)
     <- createProcess (proc "python" ["nvim/pipe.py"])
                      { std_in  = CreatePipe
                      , std_out = CreatePipe }
+  hSetEncoding inp utf8
+  hSetEncoding out utf8
+
   -- print r
   I.hPutStr inp . L.toStrict $ encode r
   hClose inp
-  I.hGetContents out
+  hGetContents out
 
