@@ -74,38 +74,38 @@ iYOUR PASSWORD HERE
 1</To see what she shares
 
 ~# Output data for easy parsing and link to facebook page
-""ei%Person<CR>⁰
+ei%Person<CR>⁰
 
 ~# Name
 \#fb-timeline-cover-name
-""ei%Name
-""Y
+ei%Name
+Y
 
 ~# Profile pic
 \#fbTimelineHeadline .profilePic
-""ei%ProfilePic
-""yAsrc
+ei%ProfilePic
+yAsrc
 
 ~# Date of last post
 1<
  \#recent_capsule_container abbr[data-utime]
- ""ei%TimeOfLastPost
- ""yAdata-utime
+ ei%TimeOfLastPost
+ yAdata-utime
 >
 
 ~# Go to the about page
 fAbout
-""ei%About
+ei%About
 
 ~# Overview
 1<
  \div[data-overviewsection]>div>div>div
- <""Yn>
+ <Yn>
 >
 
 ~# Go to the friends page
 Fa[data-tab-key=friends]
-""ei%Friends
+ei%Friends
 
 1<
  ~# Load all friends
@@ -114,7 +114,7 @@ Fa[data-tab-key=friends]
 
  ~# List all friends
  \#timeline-medley a[data-gt]
-   <""Y""yAhref
+   <YyAhref
     n>
 >
 ```
