@@ -119,7 +119,7 @@ ei%Friends
 >
 ```
 
-For more info, see [DOC.md](/DOC.md).
+For more info, see [DOC.md](/DOC.md) for a language specification, and [TIPS.md](/TIPS.md) for tips on how to write programs.
 
 # Building
 
